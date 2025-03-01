@@ -5,7 +5,9 @@ import connectDatabase from './config/databse.config';
 import { CustomError } from './middleware/errorhandeler.middleware';
 import productRoutes from './routes/product.routes'
 import { Together } from "together-ai";
-import chatRoutes from './routes/chatroutes'
+import chatRoutes from './routes/chat.routes'
+import path from 'path';
+
 
 const app = express();
 
@@ -17,12 +19,7 @@ connectDatabase(Db_uri)
 
 //using middleware 
 app.use(express.urlencoded ({ extended:false}));
-
-
-
-
-//call the function with the promopt 
-
+app.use('/api/uploads',express.static(path.join(__dirname,'../', 'uploads')))
 
 
 //using routes
@@ -32,7 +29,7 @@ app.use('/api/chat', chatRoutes)
 
 
 
-
+//call the function with the promopt 
 const together = new Together ({
   apiKey : process.env.TOGETHER_AI_API_KEY as string, // type assertion
 });
