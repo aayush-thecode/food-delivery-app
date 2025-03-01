@@ -4,9 +4,8 @@ import express, { NextFunction, Request, Response } from 'express'
 import connectDatabase from './config/databse.config';
 import { CustomError } from './middleware/errorhandeler.middleware';
 import productRoutes from './routes/product.routes'
-import OpenAI from 'openai';
-
-
+import { Together } from "together-ai";
+import chatRoutes from './routes/chatroutes'
 
 const app = express();
 
@@ -19,38 +18,50 @@ connectDatabase(Db_uri)
 //using middleware 
 app.use(express.urlencoded ({ extended:false}));
 
-//
-const openai = new OpenAI({
-    apiKey: process.env.OPEN_AI_KEY, // Ensure this matches your .env file
-});
 
-// Chatbot endpoint
-app.post("/chat", async (req: Request, res: Response) => {
-    try {
-      const { message } = req.body;
-  
-      const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: message }],
-      });
-  
-      res.json({ reply: response.choices[0].message.content });
-    } catch (error) {
-      console.error("AI Chatbox Error:", error);
-      res.status(500).json({ error: "Failed to fetch AI response" });
-    }
-  });
+
+
+//call the function with the promopt 
+
 
 
 //using routes
 app.use('/api/user/', userRoutes)
 app.use('/api/products', productRoutes)
+app.use('/api/chat', chatRoutes)
 
+
+
+
+const together = new Together ({
+  apiKey : process.env.TOGETHER_AI_API_KEY as string, // type assertion
+});
+
+//define an async function to get chatbox response 
+
+async function getChatResponse(prompt: string): Promise<void> {
+  try {
+    const response = await together.chat.completions.create ({
+      messages: [{ role: 'user', content: prompt }],
+      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    });
+
+    console.log(response.choices[0].message?.content);
+
+  } catch (error) {
+
+    console.log("error fetching response:", error);
+  }
+}
+
+//initialize together API with API key 
+
+getChatResponse("what are some fun things to do in food app?")
 
 //handle not found path 
 app.all('*', (req:Request, res:Response, next:NextFunction) => {
 
-    const message = `cannot ${req.method} on $a{req.originalUrl}`
+    const message = `cannot ${req.method} on ${req.originalUrl}`
 
     const error = new CustomError(message, 404)
     next(error) 
@@ -64,7 +75,7 @@ app.use((error:any, req: Request, res:Response, next:NextFunction) => {
     const status = error.status || 'error'
 
     res.status(statusCode).json ({
-        stuatus: status,
+        status: status,
         success: false,
         message: message
     })
