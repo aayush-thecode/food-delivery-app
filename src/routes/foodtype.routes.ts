@@ -1,5 +1,5 @@
 import express from 'express'
-import { create, getAll } from '../controllers/product.controller';
+import { create, deleteFood, getAll, getFoodById, updateFood } from '../controllers/foodtype.controller';
 import multer from 'multer';
 
 const router = express.Router()
@@ -20,7 +20,16 @@ const upload = multer({storage: storage})
 //register user
 router.post('/', upload.single('coverImage'), create);
 
-
+// get all food types
 router.get('/', getAll);
+
+//get all food type by id 
+router.get('/:id', getFoodById);
+
+//update food type by id 
+router.put('/:id', updateFood);
+
+//delete food type by id 
+router.delete('/:id', deleteFood)
 
 export default router; 

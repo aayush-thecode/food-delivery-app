@@ -19,13 +19,17 @@ router.post("/", async (req: Request, res: Response) => {
         }
 
         const response = await together.chat.completions.create({
+
             messages: [{ role: 'user', content: message }],
             model: "mistralai/Mistral-7B-Instruct-v0.1", // Corrected model name.  CHANGE THIS IF NEEDED.
+            
         });
 
         // Add null/undefined checks and handle potential errors
         if (response && response.choices && response.choices[0] && response.choices[0].message && response.choices[0].message.content) {
+
            res.json({ response: response.choices[0].message.content });
+
         } else {
             res.status(500).json({ error: "Unexpected response format from Together AI" });
         }
@@ -33,10 +37,15 @@ router.post("/", async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error fetching chatbot response:", error);
         // Provide more detailed error information in the response, if possible
+
         if (error instanceof Error) { // Check if it's a standard Error object
+
           res.status(500).json({ error: "Internal Server Error", details: error.message, stack: error.stack });
+
         } else {
+
           res.status(500).json({ error: "Internal Server Error", details: String(error) }); // Fallback for non-Error objects
+
         }
 
     }

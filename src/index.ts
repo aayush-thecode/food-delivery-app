@@ -3,8 +3,8 @@ import userRoutes from './routes/user.routes'
 import express, { NextFunction, Request, Response } from 'express'
 import connectDatabase from './config/databse.config';
 import { CustomError } from './middleware/errorhandeler.middleware';
-import productRoutes from './routes/product.routes'
-import { Together } from "together-ai";
+import productRoutes from './routes/foodtype.routes'
+import { Together } from "together-ai"
 import chatRoutes from './routes/chat.routes'
 import path from 'path';
 
