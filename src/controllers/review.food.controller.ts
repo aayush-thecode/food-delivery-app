@@ -66,3 +66,42 @@ export const getAllFoodReview = asyncHandler(async (req: Request, res: Response)
 
 //get food reviews by Id 
 
+export const getReviewId = asyncHandler(async (req:Request, res: Response) => {
+
+    const getReviewbyId = req.params.id;
+
+    const getFoodReview = await Review.findById(getReviewId);
+
+    if(!getReviewbyId) {
+        
+        throw new CustomError('review data not found', 400)
+
+    }
+
+    res.status(200).json ({
+
+        status: 'success',
+        success: true,
+        message: 'review data fetched successfully!',
+        data: getFoodReview
+
+    })
+})
+
+//update food review by id 
+
+export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
+
+    const ReviewId = req.params.id;
+    const {rating, review} = req.body;
+
+    const reviews = await Review.findByIdAndUpdate(ReviewId, {
+        rating, 
+        review
+    },{new: true})
+
+    if(!ReviewId) {
+        throw new CustomError('review is required', 400)
+    }
+
+})
