@@ -104,4 +104,31 @@ export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
         throw new CustomError('review is required', 400)
     }
 
+    res.status(200).json({
+        status:'successful',
+        success: true,
+        message: 'food review updated successfully!',
+        data: reviews
+    })
+
+})
+
+//delete product by Id
+
+export const deleteFoodReviewById = asyncHandler(async (req:Request, res: Response) => {
+
+    const FoodReviewID = req.params.id;
+
+    const deleteFoodReviewById = await Review.findByIdAndDelete(FoodReviewID);
+
+    if(!deleteFoodReviewById) {
+        throw new CustomError('food review not found', 400);
+    }
+
+    res.status(200).json ({
+        status:'successful',
+        success:true,
+        message:'food Review deleted successfully',
+    })
+
 })
