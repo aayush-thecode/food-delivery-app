@@ -6,7 +6,7 @@ import Review from "../models/review.food.model";
 
 
 
-// create new review 
+// create new food review 
 
 export const createFoodReview = asyncHandler(async (req:Request, res: Response) => {
 
@@ -48,7 +48,7 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 })
 
 
-// getAll  food review data 
+// getAll food review data 
 
 export const getAllFoodReview = asyncHandler(async (req: Request, res: Response) => {
 
@@ -64,66 +64,145 @@ export const getAllFoodReview = asyncHandler(async (req: Request, res: Response)
 });
 
 
-//get food reviews by Id 
+//get reviews by food type Id 
 
 export const getReviewId = asyncHandler(async (req:Request, res: Response) => {
 
-    const getReviewbyId = req.params.id;
+    const {foodId} = req.params;
 
-    const getFoodReview = await Review.findById(getReviewId);
 
-    if(!getReviewbyId) {
+    if(!foodId) {
         
         throw new CustomError('review data not found', 400)
 
     }
+
+    const food = await Review.findById(foodId) 
+
+    if(!food) {
+
+        throw new CustomError('food not found', 404);
+
+    }
+
+    // find reviews for the given foodId 
+
+    const reviews = await Review.find({food: foodId})
 
     res.status(200).json ({
 
         status: 'success',
         success: true,
         message: 'review data fetched successfully!',
-        data: getFoodReview
+        data: reviews,
 
     })
 })
 
-//update food review by id 
+
+//update review by food id 
 
 export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
 
-    const ReviewId = req.params.id;
-    const {rating, review} = req.body;
+    const {rating, ReviewId, foodId, comment} = req.body;
 
-    const reviews = await Review.findByIdAndUpdate(ReviewId, {
-        rating, 
-        review
-    },{new: true})
+    if(!ReviewId || !foodId) {
+        
+        throw new CustomError('product Id and food Id is required', 400)
 
-    if(!ReviewId) {
-        throw new CustomError('review is required', 400)
     }
 
-    res.status(200).json({
-        status:'successful',
+    const food = await foodType.findById(foodId);
+
+    if(!food) {
+        
+        throw new CustomError('Food not found', 404); 
+
+    }
+
+    const review = await Review.findById(ReviewId)
+
+    if(!review) {
+
+        throw new CustomError('Review not found', 404);
+
+    }
+
+    //store the old rating before updating new review 
+
+    const oldRating = review.rating;
+
+    //update review feilds
+
+    if(rating !== undefined) review.rating = rating;
+
+    if(comment !== undefined) review.review = comment;
+
+    await review.save();
+
+    //update the average rating 
+
+    const totalRating = (food?.averageRating as number * food.reviews.length - oldRating + rating) / food.reviews.length 
+
+    food.averageRating = totalRating
+
+    await food.save();
+
+    res.status(200).json ({ 
+        status: 'success',
         success: true,
-        message: 'food review updated successfully!',
-        data: reviews
+        data: review,
+        message: 'review updated successfully'
     })
 
-})
+});
 
-//delete product by Id
+
+//delete review by foodId
 
 export const deleteFoodReviewById = asyncHandler(async (req:Request, res: Response) => {
 
-    const FoodReviewID = req.params.id;
+    const { userId, foodId} = req.body;
 
-    const deleteFoodReviewById = await Review.findByIdAndDelete(FoodReviewID);
+ 
 
-    if(!deleteFoodReviewById) {
-        throw new CustomError('food review not found', 400);
+    if(!userId || !foodId) {
+       
+        throw new CustomError('food Id and user Id are required', 400);
+
     }
+
+    const food = await foodType.findById(foodId);
+
+    if(!food) {
+
+        throw new CustomError('food not found', 404);
+
+    }
+
+    const review = await Review.findOne({food: foodId, user: userId});
+
+    if(!review) {
+
+        throw new CustomError("review not found", 404)
+
+    }
+
+    await Review.findByIdAndDelete(review._id);
+
+    food.reviews.pull(food.reviews.filter((id) => id.toString() !== review._id.toString()))
+
+    // recalculate average rating
+    
+    if (food.reviews.length === 0) {
+
+        food.averageRating = 0;
+    } else {
+
+        const totalRating = (food.averageRating as number * (food.reviews.length + 1)) - review.rating;
+    }
+
+    await food.save();
 
     res.status(200).json ({
         status:'successful',
