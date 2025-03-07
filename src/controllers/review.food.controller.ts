@@ -197,9 +197,13 @@ export const deleteFoodReviewById = asyncHandler(async (req:Request, res: Respon
     if (food.reviews.length === 0) {
 
         food.averageRating = 0;
+
     } else {
 
         const totalRating = (food.averageRating as number * (food.reviews.length + 1)) - review.rating;
+
+        food.averageRating = totalRating / food.reviews.length; 
+        
     }
 
     await food.save();

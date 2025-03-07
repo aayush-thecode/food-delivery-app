@@ -1,10 +1,15 @@
-import jwt from 'jsonwebtoken'
-import { IPayLoad } from '../@types/jwt.interface'
-const JWT_SECRET = process.env.JWT_SECRET || ''
-const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { IPayLoad } from '../@types/global.types'
 
-export const generateToken = (payload: IPayLoad) => {
-    return jwt.sign(payload, JWT_SECRET, {
-        expiresIn: TOKEN_EXPIRES_IN
+const JWT_SECRET = process.env.JWT_SECRET || ''
+const TOKEN_EXPIRES_IN = process.env.JWT_TOKEN_EXPIRES_IN  || '1d'
+
+export function  generateToken  (payload:IPayLoad):string {
+    return jwt.sign(payload,JWT_SECRET,{
+        expiresIn:TOKEN_EXPIRES_IN as string
     })
+}
+
+export const verifyToken = (token:string) => {
+    return jwt.verify(token,JWT_SECRET) as JwtPayload
 }
