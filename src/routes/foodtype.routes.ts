@@ -1,5 +1,5 @@
 import express from 'express'
-import { create, deleteFood, getAll, getFoodById, updateFood } from '../controllers/foodtype.controller';
+import { create, getAll, getFoodById, remove, updateFood } from '../controllers/foodtype.controller';
 import multer from 'multer';
 
 const router = express.Router()
@@ -30,6 +30,6 @@ router.get('/:id', getFoodById);
 router.put('/:id', updateFood);
 
 //delete food type by id 
-router.delete('/:id', deleteFood)
+router.delete('/:id', remove)
 
 export default router; 

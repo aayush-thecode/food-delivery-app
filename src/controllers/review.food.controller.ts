@@ -32,7 +32,7 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     foodTypeId.reviews.push(newReview._id)
 
-    const totalRating: number = (food?.averageRating as number * (foodTypeId.reviews.length - 1)) + Number(rating); 
+    const totalRating: number = (food?.averageRating as number * (foodTypeId.reviews.length + 1)) + Number(rating); 
 
     foodTypeId.averageRating = totalRating / foodTypeId.reviews.length 
 

@@ -5,7 +5,7 @@ import { CustomError } from "../middleware/errorhandeler.middleware";
 
 
 
-//create 
+//create category 
 export const create = asyncHandler(async (req: Request, res: Response) => {
 
     const body = req.body;
@@ -36,23 +36,27 @@ export const getAllCategory = asyncHandler(async (req:Request, res: Response) =>
 })
 
 
-// update product data 
+//update category by product id
 
-export const UpdateProduct = asyncHandler( async (req:Request, res:Response) => {
+export const UpdateProduct = asyncHandler(async (req: Request, res: Response) => {
 
-    const productId = req.params.id;
-    const {name, price, createdBy, description} = req.body;
+    const foodId = req.params.id; 
 
-    const category = await Category.findByIdAndUpdate(productId, {
-        name, 
-        price,
-        createdBy,
-        description,
-    },{new:true})
-    
-    if(!Category){
-    throw new CustomError('category is required', 400)
+    if(!foodId) {
+        throw new CustomError('category is required', 400)
     }
+
+    const {name, description} = req.body; 
+
+    const category = await Category.findByIdAndUpdate(foodId, {
+        name,
+        description
+    }, {new:true})
+
+if(!Category) {
+    throw new CustomError('category not found', 400)
+}
+
     res.status(201).json ({
     status: 'success',
     success: true,
@@ -60,18 +64,28 @@ export const UpdateProduct = asyncHandler( async (req:Request, res:Response) => 
     data: category
 
     })
+
 })
 
-//delete productby Id 
+
+//delete categoryby Id 
 
 export const deleteCategoryById = asyncHandler (async(req: Request, res: Response) => {
 
     const CategoryId = req.params.id;
 
+    if(!CategoryId) {
+
+        throw new CustomError(' Id is required', 404)
+
+    }
+
     const deleteCategoryById = await Category.findByIdAndDelete(CategoryId);
 
-    if (!Category) {
-        throw new CustomError('product not found', 404)
+    if (!deleteCategoryById) {
+
+        throw new CustomError('Food not found', 404)
+
     }
 
     res.status(200).json ({

@@ -3,7 +3,7 @@ import { CustomError } from '../middleware/errorhandeler.middleware';
 import { asyncHandler } from '../utils/asyncHandler.utils';
 import { compare, hash } from '../utils/bcrypt.utils';
 import User from '../models/users.model';
-import { IPayLoad } from '../@types/jwt.interface';
+import { IPayLoad } from '../@types/global.types';
 import { generateToken } from '../utils/jwt.utils';
 
 

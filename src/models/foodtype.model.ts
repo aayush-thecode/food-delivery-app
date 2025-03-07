@@ -32,6 +32,11 @@ const foodSchema = new mongoose.Schema ({
             required: false
         }
     ],
+    category:{
+        type:mongoose.Types.ObjectId,
+        ref:'category',
+        required:[true, 'Category is required']
+    },
     reviews: [
         {
             type: mongoose.Types.ObjectId,
