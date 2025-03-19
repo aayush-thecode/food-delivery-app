@@ -1,11 +1,12 @@
 # food-delivery-app
 
-🍔 Food Delivery App 🚀
-This is a full-stack food delivery application built using the MERN stack (MongoDB, Express.js, React.js, Node.js). The app provides a seamless experience for users to browse restaurants, order food, and track their deliveries in real time.
+# 🍔 Food Delivery App 🚀
 
-✨ Features
-✅ User Authentication (Sign Up/Login)
-✅ Browse Restaurants & Menus
+# This is a full-stack food delivery application built using the MERN stack (MongoDB, Express.js, React.js, Node.js). The app provides a seamless experience for users to browse restaurants, order food, and track their deliveries in real time.
+
+# ✨ Features
+# ✅ User Authentication (Sign Up/Login)
+# ✅ Browse Restaurants & Menus
 ✅ Add Items to Cart & Checkout
 ✅ Online Payment Integration
 ✅ Real-time Order Tracking
@@ -25,7 +26,7 @@ bash
 Copy
 
 Edit
-git clone https://github.com/your-username/food-delivery-app.git
+git clone https://github.com/AayushcodesFX/food-delivery-app.git
 cd food-delivery-app
 Install dependencies for both frontend and backend:
 bash
