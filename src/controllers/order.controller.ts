@@ -43,4 +43,3 @@ export const placeOrder = asyncHandler(async(req: Request, res: Response) => {
     })
 });
 
-const new
