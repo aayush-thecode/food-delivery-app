@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.utils";
 import { CustomError } from "../middleware/errorhandeler.middleware";
 import foodType from "../models/foodtype.model";
 import Review from "../models/review.food.model";
+import { getPaginationData } from "../utils/pagination.utils";
 
 
 
@@ -52,14 +53,50 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
 export const getAllFoodReview = asyncHandler(async (req: Request, res: Response) => {
 
-    const reviews = await Review.find({})
+    const {rating, page, limit, query, foodType} = req.query;
 
-    res.status(200).json ({ 
-        success: true,
-        status: 'success',
-        data: reviews,
+    const currentPage = parseInt(page as string) || 1;
+    const queryLimit = parseInt(limit as string) || 10;
+    const skip = (currentPage - 1) * queryLimit;
+
+    let filter: Record<string, any> = {};
+
+    if(rating) {
+        filter.rating = parseInt(rating as string);
+    }
+
+    if(foodType) {
+        filter.foodType = foodType;
+    }
+
+    if(query) {
+        filter.$or = [
+            {
+                review: { $regex: query, $options: 'i'},
+            }
+        ];
+    }
+
+    const reviews = await Review.find(filter)
+    .skip(skip)
+    .limit(queryLimit)
+    .sort({ createdAt: -1 })
+    .populate('fooditems.foodtype')
+    .populate('user');
+
+    const totalCount = await Review.countDocuments(filter);
+
+    const pagination = getPaginationData(currentPage, queryLimit, totalCount);
+
+
+    res.status(200).json ({
+        success:true,
+        status:'success',
+        data: {
+            data: reviews,
+            pagination,
+        },
         message: 'review fetched successfully!'
-
     })
 });
 
