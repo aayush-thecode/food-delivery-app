@@ -13,7 +13,7 @@ The app provides a seamless experience for users to browse restaurants, order fo
 ✅ Rider Management System  
 
 🛠️ Tech Stack  
-Frontend: React.js, Redux, Tailwind CSS  
+Frontend: React.js, Tailwind CSS  
 Backend: Node.js, Express.js  
 Database: MongoDB, Mongoose  
 Authentication: JWT, bcrypt  
@@ -21,6 +21,7 @@ Real-time Features: Socket.io for order tracking
 Deployment: Vercel/Netlify (Frontend), Render/Heroku (Backend)  
 
 📌 Installation  
+
 Clone the repo:  
 ```bash
 git clone https://github.com/AayushcodesFX/food-delivery-app.git  
