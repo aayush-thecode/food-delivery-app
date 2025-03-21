@@ -1,20 +1,21 @@
-import 'dotenv/config'
+import 'dotenv/config' 
 import userRoutes from './routes/user.routes'
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import connectDatabase from './config/databse.config';
 import foodTypeRoutes from './routes/foodtype.routes'
 import chatRoutes from './routes/chatbot.routes'
 import path from 'path';
 import categoryRoutes from './routes/category.routes'
 import reviewRoutes from './routes/review.routes'
+import { CustomError } from './middleware/errorhandeler.middleware';
 
 
 const app = express();
 
-const Db_URI = process.env.Db_URI || ''
+const DB_URI = process.env.Db_URI || ''
 const PORT = process.env.PORT || 8080;
 
-connectDatabase(Db_URI)
+connectDatabase(DB_URI)
 
 
 //using middleware 
@@ -28,6 +29,29 @@ app.use('/api/foodtype', foodTypeRoutes)
 app.use('/api/chat', chatRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/review', reviewRoutes)
+
+// handle not found path 
+app.all('*', (req:Request, res:Response, next:NextFunction) => {
+
+    const message = `can not ${req.method} on ${req.originalUrl}`
+
+    const error = new CustomError(message, 404)
+    next(error)
+
+})
+
+//error handeler
+app.use((error:any, req:Request, res:Response, next: NextFunction) => {
+    const statusCode = error.statusCode || 500
+    const status = error.status || 'error'
+    const message = error.message || 'something went wrong!'
+
+    res.status(statusCode).json ({
+        status: status,
+        success: false,
+        message: message
+    })
+})
 
 
 

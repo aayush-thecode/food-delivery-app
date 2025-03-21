@@ -7,10 +7,10 @@ The app provides a seamless experience for users to browse restaurants, order fo
 ✅ User Authentication (Sign Up/Login)  
 ✅ Browse Restaurants & Menus  
 ✅ Add Items to Cart & Checkout  
-✅ Online Payment Integration  
-✅ Real-time Order Tracking  
+✅ Online Payment Integration  - Inprogress
+✅ Real-time Order Tracking - Inprogress
 ✅ Admin Dashboard for Restaurant Owners  
-✅ Rider Management System  
+✅ Rider Management System - Inprogress
 
 🛠️ Tech Stack  
 Frontend: React.js, Tailwind CSS  

@@ -6,6 +6,6 @@ export default function connectDatabase(url: string){
     .then(() => {
         console.log('Database connected')
     }).catch ((err) => {
-        console.log('db connect error')
+        console.log('db connect error', err)
     })
 }
