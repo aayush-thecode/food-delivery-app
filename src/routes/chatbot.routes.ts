@@ -5,8 +5,9 @@ import { CustomError } from '../middleware/errorhandeler.middleware';
 const router = Router();
 
 // Initialize Together API
+
 const together = new Together({
-    apiKey: process.env.TOGETHER_AI_API_KEY as string, // Ensure you have this in your .env file
+    apiKey: process.env.TOGETHER_AI_API_KEY as string, 
 });
 
 // Helper function to fetch chat responses

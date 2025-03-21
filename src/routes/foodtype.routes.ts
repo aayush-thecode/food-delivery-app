@@ -1,6 +1,8 @@
 import express from 'express'
 import { create, getAll, getFoodById, remove, updateFood } from '../controllers/foodtype.controller';
 import multer from 'multer';
+import { Authenticate } from '../middleware/authentication.middleware';
+import { Onlyadmin } from '../@types/global.types';
 
 const router = express.Router()
 
@@ -17,8 +19,32 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage: storage})
 
-//register user
-router.post('/', upload.single('coverImage'), create);
+//update food type by id 
+
+router.put('/:id',Authenticate(Onlyadmin), upload.fields ([
+  {
+    name: 'coverImage',
+    maxCount: 1
+  },
+  {
+    name: 'images',
+    maxCount: 6,
+  }
+]),
+updateFood);
+
+// create foodType
+
+router.post('/',Authenticate(Onlyadmin), upload.fields ([
+  {
+    name: 'coverImages',
+    maxCount: 1,
+  },
+  {
+    name: 'images',
+    maxCount: 6
+  }
+]), create);
 
 // get all food types
 router.get('/', getAll);
@@ -26,8 +52,7 @@ router.get('/', getAll);
 //get all food type by id 
 router.get('/:id', getFoodById);
 
-//update food type by id 
-router.put('/:id', updateFood);
+
 
 //delete food type by id 
 router.delete('/:id', remove)
