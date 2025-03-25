@@ -19,7 +19,8 @@ connectDatabase(DB_URI)
 
 
 //using middleware 
-app.use(express.urlencoded ({ extended:false}));
+app.use(express.json());
+app.use(express.urlencoded ({ extended:true}));
 app.use('/api/uploads',express.static(path.join(__dirname,'../', 'uploads')))
 
 

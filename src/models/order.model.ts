@@ -1,5 +1,7 @@
-import {Schema, model} from 'mongoose'
+import { Schema } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import { model } from 'mongoose';
+
 
 const orderSchema = new Schema ({
     user: {
@@ -44,7 +46,7 @@ const orderSchema = new Schema ({
     }
 }, {timestamps: true})
 
-const Order  = model('order', orderSchema)
+const Order = model('order', orderSchema)
 
 export default Order
 
