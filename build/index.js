@@ -8,7 +8,6 @@ const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const express_1 = __importDefault(require("express"));
 const databse_config_1 = __importDefault(require("./config/databse.config"));
 const foodtype_routes_1 = __importDefault(require("./routes/foodtype.routes"));
-const chatbot_routes_1 = __importDefault(require("./routes/chatbot.routes"));
 const path_1 = __importDefault(require("path"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
@@ -24,7 +23,6 @@ app.use('/api/uploads', express_1.default.static(path_1.default.join(__dirname, 
 //using routes
 app.use('/api/user', user_routes_1.default);
 app.use('/api/foodtype', foodtype_routes_1.default);
-app.use('/api/chat', chatbot_routes_1.default);
 app.use('/api/category', category_routes_1.default);
 app.use('/api/review', review_routes_1.default);
 // handle not found path 

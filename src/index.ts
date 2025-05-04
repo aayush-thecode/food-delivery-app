@@ -3,7 +3,6 @@ import userRoutes from './routes/user.routes'
 import express, { NextFunction, Request, Response } from 'express'
 import connectDatabase from './config/databse.config';
 import foodTypeRoutes from './routes/foodtype.routes'
-import chatRoutes from './routes/chatbot.routes'
 import path from 'path';
 import categoryRoutes from './routes/category.routes'
 import reviewRoutes from './routes/review.routes'
@@ -27,7 +26,6 @@ app.use('/api/uploads',express.static(path.join(__dirname,'../', 'uploads')))
 //using routes
 app.use('/api/user', userRoutes)
 app.use('/api/foodtype', foodTypeRoutes)
-app.use('/api/chat', chatRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/review', reviewRoutes)
 
