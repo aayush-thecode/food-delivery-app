@@ -1,0 +1,49 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
+const user_routes_1 = __importDefault(require("./routes/user.routes"));
+const express_1 = __importDefault(require("express"));
+const databse_config_1 = __importDefault(require("./config/databse.config"));
+const foodtype_routes_1 = __importDefault(require("./routes/foodtype.routes"));
+const chatbot_routes_1 = __importDefault(require("./routes/chatbot.routes"));
+const path_1 = __importDefault(require("path"));
+const category_routes_1 = __importDefault(require("./routes/category.routes"));
+const review_routes_1 = __importDefault(require("./routes/review.routes"));
+const errorhandeler_middleware_1 = require("./middleware/errorhandeler.middleware");
+const app = (0, express_1.default)();
+const DB_URI = process.env.Db_URI || '';
+const PORT = process.env.PORT || 8080;
+(0, databse_config_1.default)(DB_URI);
+//using middleware 
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
+app.use('/api/uploads', express_1.default.static(path_1.default.join(__dirname, '../', 'uploads')));
+//using routes
+app.use('/api/user', user_routes_1.default);
+app.use('/api/foodtype', foodtype_routes_1.default);
+app.use('/api/chat', chatbot_routes_1.default);
+app.use('/api/category', category_routes_1.default);
+app.use('/api/review', review_routes_1.default);
+// handle not found path 
+app.all('*', (req, res, next) => {
+    const message = `can not ${req.method} on ${req.originalUrl}`;
+    const error = new errorhandeler_middleware_1.CustomError(message, 404);
+    next(error);
+});
+//error handeler
+app.use((error, req, res, next) => {
+    const statusCode = error.statusCode || 500;
+    const status = error.status || 'error';
+    const message = error.message || 'something went wrong!';
+    res.status(statusCode).json({
+        status: status,
+        success: false,
+        message: message
+    });
+});
+app.listen(PORT, () => {
+    console.log(`server is running at http://localhost:${PORT}`);
+});
