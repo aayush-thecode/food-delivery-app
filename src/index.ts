@@ -11,7 +11,7 @@ import { CustomError } from './middleware/errorhandeler.middleware';
 
 const app = express();
 
-const DB_URI = process.env.Db_URI || ''
+const DB_URI = process.env.DB_URI || ''
 const PORT = process.env.PORT || 8080;
 
 connectDatabase(DB_URI)

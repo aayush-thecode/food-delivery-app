@@ -13,7 +13,7 @@ const category_routes_1 = __importDefault(require("./routes/category.routes"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
 const errorhandeler_middleware_1 = require("./middleware/errorhandeler.middleware");
 const app = (0, express_1.default)();
-const DB_URI = process.env.Db_URI || '';
+const DB_URI = process.env.DB_URI || '';
 const PORT = process.env.PORT || 8080;
 (0, databse_config_1.default)(DB_URI);
 //using middleware 
