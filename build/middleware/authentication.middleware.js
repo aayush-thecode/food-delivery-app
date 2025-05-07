@@ -18,23 +18,19 @@ const users_model_1 = __importDefault(require("../models/users.model"));
 const errorhandeler_middleware_1 = require("./errorhandeler.middleware");
 const Authenticate = (roles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
         try {
             const authHeader = req.headers["authorization"];
-            console.log("👊 ~ authentication.middleware.ts:15 ~ return ~ token:", req.headers["authorization"]);
             if (!authHeader || !authHeader.startsWith("BEARER")) {
-                throw new errorhandeler_middleware_1.CustomError("Unauthorized, Authorization header is missing", 401);
+                throw new errorhandeler_middleware_1.CustomError("Unauthorized, Authorization token is missing", 401);
             }
             const access_token = authHeader.split(" ")[1];
-            console.log("👊 ~ authentication.middleware.ts:23 ~ return ~ access_token:", access_token);
             if (!access_token) {
                 throw new errorhandeler_middleware_1.CustomError("Unauthorized, token is missing", 401);
             }
             const decoded = (0, jwt_utils_1.verifyToken)(access_token);
-            if ((decoded === null || decoded === void 0 ? void 0 : decoded.exp) && decoded.exp * 1000 > Date.now()) {
+            if (decoded.exp && decoded.exp * 1000 > Date.now()) {
                 throw new errorhandeler_middleware_1.CustomError("Unauthorized, access denied", 401);
             }
-            console.log("👊 ~ authentication.middleware.ts:27 ~ return ~ decoded:", decoded);
             if (!decoded) {
                 throw new errorhandeler_middleware_1.CustomError("Unauthorized, Invalid token", 401);
             }
@@ -56,7 +52,7 @@ const Authenticate = (roles) => {
             next();
         }
         catch (err) {
-            throw new errorhandeler_middleware_1.CustomError((_a = err === null || err === void 0 ? void 0 : err.message) !== null && _a !== void 0 ? _a : "Something wend wrong", 500);
+            next(err);
         }
     });
 };

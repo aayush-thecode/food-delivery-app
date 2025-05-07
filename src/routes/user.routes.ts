@@ -12,7 +12,7 @@ router.post('/', register);
 router.put('/:id',Authenticate(OnlyAdmin), update);
 
 //login to user
-router.post('login',login)
+router.post('/login',login)
 
 //get all users
 router.get('/', Authenticate(OnlyAdmin),getAllData)

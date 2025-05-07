@@ -19,8 +19,6 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
         }
         const hashedPassword = await hash(body.password)
 
-        console.log("🚀 ~ register ~ hashedPassword:", hashedPassword)
-
         body.password = hashedPassword
 
         const user = await User.create(body)
@@ -135,7 +133,7 @@ export const login = asyncHandler(async (req:Request, res: Response) => {
 
     //Compare hash 
 
-    const isMatch = compare (password, user?.password as string);
+    const isMatch = await compare (password, user.password as string);
 
     if (!isMatch) {
 
@@ -153,7 +151,7 @@ export const login = asyncHandler(async (req:Request, res: Response) => {
 
       const token = generateToken(payload);
 
-  res.cookie('access_token', token,{
+    res.cookie('access_token', token,{
       
       httpOnly:true,
       secure: process.env.NODE_ENV === 'production'
@@ -162,7 +160,7 @@ export const login = asyncHandler(async (req:Request, res: Response) => {
     status: "success",
     success: true,
     message: "Login successful",
-    token,
+    token,user
   });
 });
 

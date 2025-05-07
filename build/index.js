@@ -30,6 +30,7 @@ app.use('/api/user', user_routes_1.default);
 app.use('/api/foodtype', foodtype_routes_1.default);
 app.use('/api/category', category_routes_1.default);
 app.use('/api/review', review_routes_1.default);
+//health check route
 app.use('/', (req, res) => {
     res.status(200).json({ message: 'server is up & running' });
 });

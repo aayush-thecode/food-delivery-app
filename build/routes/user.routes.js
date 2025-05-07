@@ -13,7 +13,7 @@ router.post('/', user_controller_1.register);
 //update and update users profile
 router.put('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), user_controller_1.update);
 //login to user
-router.post('login', user_controller_1.login);
+router.post('/login', user_controller_1.login);
 //get all users
 router.get('/', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), user_controller_1.getAllData);
 exports.default = router;

@@ -26,7 +26,6 @@ exports.register = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaite
         throw new errorhandeler_middleware_1.CustomError('Password is required', 400);
     }
     const hashedPassword = yield (0, bcrypt_utils_1.hash)(body.password);
-    console.log("🚀 ~ register ~ hashedPassword:", hashedPassword);
     body.password = hashedPassword;
     const user = yield users_model_1.default.create(body);
     res.status(201).json({
@@ -109,7 +108,7 @@ exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(v
         return;
     }
     //Compare hash 
-    const isMatch = (0, bcrypt_utils_1.compare)(password, user === null || user === void 0 ? void 0 : user.password);
+    const isMatch = yield (0, bcrypt_utils_1.compare)(password, user.password);
     if (!isMatch) {
         throw new errorhandeler_middleware_1.CustomError('Wrong credentials provided', 400);
         return;
@@ -129,7 +128,7 @@ exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(v
         status: "success",
         success: true,
         message: "Login successful",
-        token,
+        token, user
     });
 }));
 //delete user by id 

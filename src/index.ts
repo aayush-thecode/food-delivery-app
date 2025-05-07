@@ -12,7 +12,7 @@ import cors from 'cors';
 
 const app = express();
 
-const DB_URI = process.env.DB_URI || ''
+const DB_URI = process.env.DB_URI || '';
 const PORT = process.env.PORT || 8080;
 
 connectDatabase(DB_URI)
@@ -37,6 +37,7 @@ app.use('/api/foodtype', foodTypeRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/review', reviewRoutes)
 
+//health check route
 app.use('/',(req:Request, res:Response) => {
     res.status(200).json({message:'server is up & running'});
 })
@@ -47,7 +48,7 @@ app.all('*', (req:Request, res:Response, next:NextFunction) => {
     const message = `can not ${req.method} on ${req.originalUrl}`
 
     const error = new CustomError(message, 404)
-    next(error)
+    next(error);
 
 })
 

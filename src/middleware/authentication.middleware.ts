@@ -5,30 +5,24 @@ import User from "../models/users.model";
 import { CustomError } from "./errorhandeler.middleware";
 
 export const Authenticate = (
+
 	roles?: Role[]
+
 ): ((req: Request, res: Response, next: NextFunction) => Promise<void>) => {
+
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const authHeader = req.headers["authorization"] as string;
 
-			console.log(
-				"👊 ~ authentication.middleware.ts:15 ~ return ~ token:",
-				req.headers["authorization"]
-			);
 
 			if (!authHeader || !authHeader.startsWith("BEARER")) {
 				throw new CustomError(
-					"Unauthorized, Authorization header is missing",
+					"Unauthorized, Authorization token is missing",
 					401
 				);
 			}
 
 			const access_token = authHeader.split(" ")[1];
-
-			console.log(
-				"👊 ~ authentication.middleware.ts:23 ~ return ~ access_token:",
-				access_token
-			);
 
 			if (!access_token) {
 				throw new CustomError("Unauthorized, token is missing", 401);
@@ -36,14 +30,9 @@ export const Authenticate = (
 
 			const decoded = verifyToken(access_token);
 
-			if (decoded?.exp && decoded.exp * 1000 > Date.now()) {
+			if (decoded.exp && decoded.exp * 1000 > Date.now()) {
 				throw new CustomError("Unauthorized, access denied", 401);
 			}
-
-			console.log(
-				"👊 ~ authentication.middleware.ts:27 ~ return ~ decoded:",
-				decoded
-			);
 
 			if (!decoded) {
 				throw new CustomError("Unauthorized, Invalid token", 401);
@@ -74,7 +63,7 @@ export const Authenticate = (
 			next();
 
 		} catch (err: any) {
-			throw new CustomError(err?.message ?? "Something wend wrong", 500);
+			next(err);
 		}
 	};
 };
