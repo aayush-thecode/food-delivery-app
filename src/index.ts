@@ -7,6 +7,7 @@ import path from 'path';
 import categoryRoutes from './routes/category.routes'
 import reviewRoutes from './routes/review.routes'
 import { CustomError } from './middleware/errorhandeler.middleware';
+import cors from 'cors';
 
 
 const app = express();
@@ -17,9 +18,16 @@ const PORT = process.env.PORT || 8080;
 connectDatabase(DB_URI)
 
 
-//using middleware 
+//using middleware
+app.use(cors({
+    origin: '*'
+}));
+app.use(express.urlencoded({extended: false }));
 app.use(express.json());
-app.use(express.urlencoded ({ extended:true}));
+
+
+
+//serving static files
 app.use('/api/uploads',express.static(path.join(__dirname,'../', 'uploads')))
 
 
@@ -28,6 +36,10 @@ app.use('/api/user', userRoutes)
 app.use('/api/foodtype', foodTypeRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/review', reviewRoutes)
+
+app.use('/',(req:Request, res:Response) => {
+    res.status(200).json({message:'server is up & running'});
+})
 
 // handle not found path 
 app.all('*', (req:Request, res:Response, next:NextFunction) => {

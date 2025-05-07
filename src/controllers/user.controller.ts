@@ -3,9 +3,10 @@ import { CustomError } from '../middleware/errorhandeler.middleware';
 import { asyncHandler } from '../utils/asyncHandler.utils';
 import { compare, hash } from '../utils/bcrypt.utils';
 import User from '../models/users.model';
-import { IPayLoad } from '../@types/global.types';
+
 import { generateToken } from '../utils/jwt.utils';
 import { getPaginationData } from '../utils/pagination.utils';
+import { IPayload } from '../@types/jwt.interfaces';
 
 
 // user registration 
@@ -142,7 +143,7 @@ export const login = asyncHandler(async (req:Request, res: Response) => {
 
       return ;
     }
-      const payload:IPayLoad = {
+      const payload:IPayload = {
           _id: user._id,
           email: user.email as string,
           firstName: user.firstName,

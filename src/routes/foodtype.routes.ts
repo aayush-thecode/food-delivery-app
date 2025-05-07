@@ -2,7 +2,7 @@ import express from 'express'
 import { create, getAll, getFoodById, remove, updateFood } from '../controllers/foodtype.controller';
 import multer from 'multer';
 import { Authenticate } from '../middleware/authentication.middleware';
-import { Onlyadmin } from '../@types/global.types';
+import { OnlyAdmin } from '../@types/global.types';
 
 const router = express.Router()
 
@@ -21,7 +21,7 @@ const upload = multer({storage: storage})
 
 //update food type by id 
 
-router.put('/:id',Authenticate(Onlyadmin), upload.fields ([
+router.put('/:id',Authenticate(OnlyAdmin), upload.fields ([
   {
     name: 'coverImage',
     maxCount: 1
@@ -35,7 +35,7 @@ updateFood);
 
 // create foodType
 
-router.post('/',Authenticate(Onlyadmin), upload.fields ([
+router.post('/',Authenticate(OnlyAdmin), upload.fields ([
   {
     name: 'coverImages',
     maxCount: 1,

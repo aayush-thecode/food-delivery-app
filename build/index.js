@@ -12,19 +12,27 @@ const path_1 = __importDefault(require("path"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
 const errorhandeler_middleware_1 = require("./middleware/errorhandeler.middleware");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const DB_URI = process.env.DB_URI || '';
 const PORT = process.env.PORT || 8080;
 (0, databse_config_1.default)(DB_URI);
-//using middleware 
+//using middleware
+app.use((0, cors_1.default)({
+    origin: '*'
+}));
+app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
+//serving static files
 app.use('/api/uploads', express_1.default.static(path_1.default.join(__dirname, '../', 'uploads')));
 //using routes
 app.use('/api/user', user_routes_1.default);
 app.use('/api/foodtype', foodtype_routes_1.default);
 app.use('/api/category', category_routes_1.default);
 app.use('/api/review', review_routes_1.default);
+app.use('/', (req, res) => {
+    res.status(200).json({ message: 'server is up & running' });
+});
 // handle not found path 
 app.all('*', (req, res, next) => {
     const message = `can not ${req.method} on ${req.originalUrl}`;

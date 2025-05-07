@@ -27,13 +27,25 @@ const foodSchema = new mongoose_1.default.Schema({
         trim: true,
     },
     coverImage: {
-        type: String,
-        required: false,
+        public_id: {
+            type: String,
+            required: true,
+        },
+        path: {
+            type: String,
+            required: true,
+        },
     },
     images: [
         {
-            type: String,
-            required: false
+            public_id: {
+                type: String,
+                required: true,
+            },
+            path: {
+                type: String,
+                required: true,
+            },
         }
     ],
     category: {

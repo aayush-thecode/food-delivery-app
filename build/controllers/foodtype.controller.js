@@ -18,36 +18,92 @@ const foodtype_model_1 = __importDefault(require("../models/foodtype.model"));
 const errorhandeler_middleware_1 = require("../middleware/errorhandeler.middleware");
 const deleteFiles_utils_1 = require("../utils/deleteFiles.utils");
 const category_model_1 = __importDefault(require("../models/category.model"));
+const pagination_utils_1 = require("../utils/pagination.utils");
 //create food type 
 exports.create = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const body = req.body;
-    const foodProduct = yield foodtype_model_1.default.create(body);
-    const { coverImage, images } = req.files;
-    if (!coverImage) {
-        throw new errorhandeler_middleware_1.CustomError('cover image is required', 400);
+    const { name, price, description, category: categoryId } = req.body;
+    const admin = req.user;
+    const files = req.files;
+    if (!files || !files.coverImage) {
+        throw new errorhandeler_middleware_1.CustomError("Cover image is required", 400);
     }
-    foodProduct.coverImage = (_a = coverImage[0]) === null || _a === void 0 ? void 0 : _a.path;
+    const coverImage = files.coverImage;
+    const images = files.images;
+    // get category
+    const category = yield category_model_1.default.findById(categoryId);
+    if (!category) {
+        throw new errorhandeler_middleware_1.CustomError(" Food Category not found", 404);
+    }
+    const product = new foodtype_model_1.default({
+        name,
+        price,
+        description,
+        createdBy: admin._id,
+        category: category._id,
+    });
+    product.coverImage = {
+        path: coverImage[0].path,
+        public_id: coverImage[0].filename
+    };
     if (images && images.length > 0) {
-        const imagePath = images.map((image, index) => image.path);
-        foodProduct.images = imagePath;
+        const imagePath = images.map((image, index) => {
+            return {
+                path: image.path,
+                public_id: image.filename
+            };
+        });
+        product.images = [...product.images, ...imagePath];
     }
-    yield foodProduct.save();
+    yield product.save();
     res.status(201).json({
-        status: 'success',
+        status: "success",
         success: true,
-        data: foodProduct,
-        message: 'foodType created successfully!'
+        data: product,
+        message: "Food type created successfully!",
     });
 }));
 // get all food type 
 exports.getAll = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const foodtype = yield foodtype_model_1.default.find({}).populate('createdBy');
+    const { limit, page, query, category, minPrice, maxPrice, sortBy = "createdAt", order = "DESC", } = req.query;
+    const queryLimit = parseInt(limit) || 10;
+    const currentPage = parseInt(page) || 1;
+    const skip = (currentPage - 1) * queryLimit;
+    let filter = {};
+    if (category) {
+        filter.category = category;
+    }
+    if (minPrice && maxPrice) {
+        filter.price = {
+            $lte: parseFloat(maxPrice),
+            $gte: parseFloat(minPrice),
+        };
+    }
+    if (query) {
+        filter.$or = [
+            {
+                name: { $regex: query, $options: "i" },
+            },
+            {
+                description: { $regex: query, $options: "i" },
+            },
+        ];
+    }
+    const products = yield foodtype_model_1.default.find(filter)
+        .skip(skip)
+        .limit(queryLimit)
+        .populate("createdBy", '-password')
+        .populate("category")
+        .sort({ [sortBy]: order === "DESC" ? -1 : 1 });
+    const totalCount = yield foodtype_model_1.default.countDocuments(filter);
+    const pagination = (0, pagination_utils_1.getPaginationData)(currentPage, queryLimit, totalCount);
     res.status(200).json({
         success: true,
-        status: 'success',
-        data: foodtype,
-        message: 'foodType fetched successfully!'
+        status: "success",
+        data: {
+            data: products,
+            pagination,
+        },
+        message: "Products fetched successfully!",
     });
 }));
 // get food type by id
@@ -55,9 +111,9 @@ exports.getFoodById = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awa
     const foodId = req.params.id;
     const foodTypeId = yield foodtype_model_1.default.findById(foodId).populate("createdBy");
     if (!foodId) {
-        throw new errorhandeler_middleware_1.CustomError('food type not found please type correct food type', 400);
+        throw new errorhandeler_middleware_1.CustomError('food type not found please type correct food type', 404);
     }
-    res.status(200).json({
+    res.status(201).json({
         status: 'success',
         success: true,
         message: 'food fetched successfully',
@@ -66,7 +122,6 @@ exports.getFoodById = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awa
 }));
 //update food type by Id 
 exports.updateFood = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const { deletedImages, name, description, price, categoryId } = req.body;
     const foodId = req.params.id;
     const { coverImage, images } = req.files;
@@ -83,11 +138,14 @@ exports.updateFood = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awai
     }
     if (coverImage) {
         yield (0, deleteFiles_utils_1.deleteFiles)([foodtype.coverImage]);
-        foodtype.coverImage = (_a = coverImage[0]) === null || _a === void 0 ? void 0 : _a.path;
+        foodtype.coverImage = {
+            path: coverImage[0].path,
+            public_id: coverImage[0].filename
+        };
     }
     if (deletedImages && deletedImages.length > 0) {
         yield (0, deleteFiles_utils_1.deleteFiles)(deletedImages);
-        foodtype.images = foodtype.images.filter((image) => !deletedImages.include(image));
+        foodtype.images = foodtype.images.filter((image) => !deletedImages.include(image.public_id));
     }
     if (images && images.length > 0) {
         const imagePath = images.map((image, index) => image.path);
@@ -103,13 +161,26 @@ exports.updateFood = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awai
 }));
 //delete food type by id 
 exports.remove = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const foodId = req.params.id;
-    const foodtype = yield foodtype_model_1.default.findById(foodId);
+    const foodtype = yield foodtype_model_1.default.findByIdAndDelete(foodId);
     if (!foodtype) {
-        throw new errorhandeler_middleware_1.CustomError('food delete failed', 400);
+        throw new errorhandeler_middleware_1.CustomError('food type not found', 404);
+    }
+    if (foodtype.coverImage) {
+        // @ts-expect-error 
+        yield (0, deleteFiles_utils_1.deleteFiles)([(_a = product.coverImage) === null || _a === void 0 ? void 0 : _a.public_id]);
+    }
+    //delete assosiated images if they exist
+    const imagesToDelete = [];
+    if (foodtype.coverImage) {
+        imagesToDelete.push(foodtype.coverImage);
     }
     if (foodtype.images && foodtype.images.length > 0) {
-        yield (0, deleteFiles_utils_1.deleteFiles)(foodtype.images);
+        imagesToDelete.push(foodtype.coverImage);
+    }
+    if (imagesToDelete.length > 0) {
+        yield (0, deleteFiles_utils_1.deleteFiles)(imagesToDelete);
     }
     yield foodtype_model_1.default.findByIdAndDelete(foodtype._id);
     res.status(201).json({

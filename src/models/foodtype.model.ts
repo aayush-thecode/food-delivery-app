@@ -23,15 +23,26 @@ const foodSchema = new mongoose.Schema ({
         trim: true,
     },
     coverImage: {
-        type: String,
-        required: false,
+        public_id:{
+            type:String,
+            required:true,
+        },
+        path:{
+            type:String,
+            required:true,
+        },
     },
     images: [
-        {
-            type: String,
-            required: false
-        }
-    ],
+    {
+        public_id:{
+            type:String,
+            required:true,
+        },
+        path:{
+            type:String,
+            required:true,
+        },
+    }],
     category:{
         type:mongoose.Types.ObjectId,
         ref:'category',

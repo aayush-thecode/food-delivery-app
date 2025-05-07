@@ -21,7 +21,7 @@ const storage = multer_1.default.diskStorage({
 });
 const upload = (0, multer_1.default)({ storage: storage });
 //update food type by id 
-router.put('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.Onlyadmin), upload.fields([
+router.put('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), upload.fields([
     {
         name: 'coverImage',
         maxCount: 1
@@ -32,7 +32,7 @@ router.put('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.
     }
 ]), foodtype_controller_1.updateFood);
 // create foodType
-router.post('/', (0, authentication_middleware_1.Authenticate)(global_types_1.Onlyadmin), upload.fields([
+router.post('/', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), upload.fields([
     {
         name: 'coverImages',
         maxCount: 1,
