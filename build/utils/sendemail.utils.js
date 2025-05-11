@@ -17,7 +17,7 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const transporter = nodemailer_1.default.createTransport({
     host: process.env.SMTP_SERVER,
     port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_PORT === '465', // true for port 465, false for other ports
+    secure: Number(process.env.SMTP_PORT) === 465, // true for port 465, false for other ports
     auth: {
         user: process.env.SMTP_EMAIL,
         pass: process.env.SMTP_PASSWORD,

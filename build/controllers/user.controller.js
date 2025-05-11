@@ -12,13 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUserById = exports.login = exports.update = exports.getAllData = exports.register = void 0;
+exports.resetPassword = exports.forgotPassword = exports.deleteUserById = exports.login = exports.update = exports.getAllData = exports.register = void 0;
 const errorhandeler_middleware_1 = require("../middleware/errorhandeler.middleware");
 const asyncHandler_utils_1 = require("../utils/asyncHandler.utils");
 const bcrypt_utils_1 = require("../utils/bcrypt.utils");
 const users_model_1 = __importDefault(require("../models/users.model"));
 const jwt_utils_1 = require("../utils/jwt.utils");
 const pagination_utils_1 = require("../utils/pagination.utils");
+const tokenGenerator_1 = require("../utils/tokenGenerator");
+const sendemail_utils_1 = require("../utils/sendemail.utils");
+const crypto_1 = __importDefault(require("crypto"));
 // user registration 
 exports.register = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -111,7 +114,6 @@ exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(v
     const isMatch = yield (0, bcrypt_utils_1.compare)(password, user.password);
     if (!isMatch) {
         throw new errorhandeler_middleware_1.CustomError('Wrong credentials provided', 400);
-        return;
     }
     const payload = {
         _id: user._id,
@@ -143,5 +145,57 @@ exports.deleteUserById = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __
         success: true,
         message: 'user deleted sucessfully',
         data: deleteUserId,
+    });
+}));
+// Forgot Password
+exports.forgotPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    if (!email) {
+        throw new errorhandeler_middleware_1.CustomError("Email is required", 400);
+    }
+    const user = yield users_model_1.default.findOne({ email });
+    if (!user) {
+        throw new errorhandeler_middleware_1.CustomError("User not found", 404);
+    }
+    const { token, hashedToken } = (0, tokenGenerator_1.generateResetToken)();
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // valid for 15 minutes
+    yield user.save();
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    yield (0, sendemail_utils_1.sendEmail)({
+        to: user.email,
+        subject: 'Reset your password',
+        html: `<p>You requested a password reset.</p>
+           <p>Click here: <a href="${resetUrl}">${resetUrl}</a></p>
+           <p>This link expires in 15 minutes.</p>`,
+    });
+    res.status(200).json({
+        success: true,
+        message: 'Password reset link sent to email',
+    });
+}));
+// Reset Password
+exports.resetPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.params;
+    const { password } = req.body;
+    if (!password) {
+        throw new errorhandeler_middleware_1.CustomError('Password is required', 400);
+    }
+    const hashedToken = crypto_1.default.createHash('sha256').update(token).digest('hex');
+    const user = yield users_model_1.default.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: new Date() }, // Token is still valid
+    });
+    if (!user) {
+        throw new errorhandeler_middleware_1.CustomError('Invalid or expired reset token', 400);
+    }
+    // Hash the new password and save it
+    user.password = yield (0, bcrypt_utils_1.hash)(password);
+    user.resetPasswordToken = undefined; // Clear the reset token after use
+    user.resetPasswordExpires = undefined; // Clear the expiration time
+    yield user.save();
+    res.status(200).json({
+        success: true,
+        message: 'Password has been reset successfully.',
     });
 }));

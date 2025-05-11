@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const global_types_1 = require("../@types/global.types");
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-// using userschema ...
 const userSchema = new mongoose_1.default.Schema({
     firstName: {
         type: String,
@@ -17,7 +16,7 @@ const userSchema = new mongoose_1.default.Schema({
     lastName: {
         type: String,
         required: [true, 'last name is required'],
-        max: [50, 'last name cannot exceed fiftey character'],
+        max: [50, 'last name cannot exceed fifty character'],
         min: [3, 'last name should be at least three character']
     },
     email: {
@@ -55,7 +54,13 @@ const userSchema = new mongoose_1.default.Schema({
                 required: true,
             }
         }
-    ]
+    ],
+    resetPasswordToken: {
+        type: String,
+    },
+    resetPasswordExpires: {
+        type: Date,
+    }
 }, { timestamps: true });
 const User = mongoose_1.default.model('user', userSchema);
 exports.default = User;
