@@ -7,6 +7,9 @@ import User from '../models/users.model';
 import { generateToken } from '../utils/jwt.utils';
 import { getPaginationData } from '../utils/pagination.utils';
 import { IPayload } from '../@types/jwt.interfaces';
+import { generateResetToken } from '../utils/tokenGenerator';
+import { sendEmail } from '../utils/sendemail.utils';
+import crypto from 'crypto';
 
 
 // user registration 
@@ -139,7 +142,6 @@ export const login = asyncHandler(async (req:Request, res: Response) => {
 
       throw new CustomError('Wrong credentials provided', 400)
 
-      return ;
     }
       const payload:IPayload = {
           _id: user._id,
@@ -188,3 +190,71 @@ export const deleteUserById = asyncHandler( async(req: Request, res:Response) =>
       })
     
     }) 
+
+// Forgot Password
+export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new CustomError("Email is required", 400);
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new CustomError("User not found", 404);
+  }
+
+  const { token, hashedToken } = generateResetToken();
+
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // valid for 15 minutes
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+  
+  await sendEmail({
+    to: user.email as string,
+    subject: 'Reset your password',
+    html: `<p>You requested a password reset.</p>
+           <p>Click here: <a href="${resetUrl}">${resetUrl}</a></p>
+           <p>This link expires in 15 minutes.</p>`,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Password reset link sent to email',
+  });
+});
+
+// Reset Password
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  if (!password) {
+    throw new CustomError('Password is required', 400);
+  }
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: new Date() }, // Token is still valid
+  });
+
+  if (!user) {
+    throw new CustomError('Invalid or expired reset token', 400);
+  }
+
+  // Hash the new password and save it
+  user.password = await hash(password);
+  user.resetPasswordToken = undefined; // Clear the reset token after use
+  user.resetPasswordExpires = undefined; // Clear the expiration time
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Password has been reset successfully.',
+  });
+});

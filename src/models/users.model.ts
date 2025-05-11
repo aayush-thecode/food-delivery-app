@@ -4,7 +4,6 @@ import { Role } from "../@types/global.types";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-// using userschema ...
 const userSchema = new mongoose.Schema ({
     firstName: {
         type: String,
@@ -15,7 +14,7 @@ const userSchema = new mongoose.Schema ({
     lastName: {
         type: String,
         required: [true, 'last name is required'],
-        max: [ 50, 'last name cannot exceed fiftey character'],
+        max: [ 50, 'last name cannot exceed fifty character'],
         min: [ 3, 'last name should be at least three character']
     },
     email: {
@@ -53,7 +52,13 @@ const userSchema = new mongoose.Schema ({
                 required: true,
             }
         }
-    ]
+    ], 
+    resetPasswordToken: {
+        type: String,
+    },
+    resetPasswordExpires : {
+        type: Date,
+    }
 
 }, {timestamps: true }
 );

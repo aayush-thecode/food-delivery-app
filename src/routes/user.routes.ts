@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllData, login, register, update } from '../controllers/user.controller';
+import { forgotPassword, getAllData, login, register, resetPassword, update } from '../controllers/user.controller';
 import { OnlyAdmin } from '../@types/global.types';
 import { Authenticate } from './../middleware/authentication.middleware';
 
@@ -12,9 +12,15 @@ router.post('/', register);
 router.put('/:id',Authenticate(OnlyAdmin), update);
 
 //login to user
-router.post('/login',login)
+router.post('/login', login)
 
 //get all users
 router.get('/', Authenticate(OnlyAdmin),getAllData)
+
+// Forgot password route
+router.post('/forgot-password', forgotPassword);
+
+// Reset password route
+router.post('/reset-password/:token', resetPassword);
 
 export default router;
