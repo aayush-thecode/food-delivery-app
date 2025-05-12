@@ -52,8 +52,6 @@ router.get('/', getAll);
 //get all food type by id 
 router.get('/:id', getFoodById);
 
-
-
 //delete food type by id 
 router.delete('/:id', remove)
 

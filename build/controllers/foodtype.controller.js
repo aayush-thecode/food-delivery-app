@@ -34,14 +34,14 @@ exports.create = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
     if (!category) {
         throw new errorhandeler_middleware_1.CustomError(" Food Category not found", 404);
     }
-    const product = new foodtype_model_1.default({
+    const food = new foodtype_model_1.default({
         name,
         price,
         description,
         createdBy: admin._id,
         category: category._id,
     });
-    product.coverImage = {
+    food.coverImage = {
         path: coverImage[0].path,
         public_id: coverImage[0].filename
     };
@@ -52,13 +52,13 @@ exports.create = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
                 public_id: image.filename
             };
         });
-        product.images = [...product.images, ...imagePath];
+        food.images = [...food.images, ...imagePath];
     }
-    yield product.save();
+    yield food.save();
     res.status(201).json({
         status: "success",
         success: true,
-        data: product,
+        data: food,
         message: "Food type created successfully!",
     });
 }));
@@ -88,7 +88,7 @@ exports.getAll = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
             },
         ];
     }
-    const products = yield foodtype_model_1.default.find(filter)
+    const foods = yield foodtype_model_1.default.find(filter)
         .skip(skip)
         .limit(queryLimit)
         .populate("createdBy", '-password')
@@ -100,10 +100,10 @@ exports.getAll = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
         success: true,
         status: "success",
         data: {
-            data: products,
+            data: foods,
             pagination,
         },
-        message: "Products fetched successfully!",
+        message: "foods fetched successfully!",
     });
 }));
 // get food type by id

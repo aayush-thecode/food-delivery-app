@@ -31,7 +31,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 		throw new CustomError(" Food Category not found", 404);
 	}
 
-	const product = new foodType({
+	const food = new foodType({
 		name,
 		price,
 		description,
@@ -39,7 +39,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 		category: category._id,
 	});
 
-	product.coverImage = {
+	food.coverImage = {
         path:coverImage[0].path,
         public_id:coverImage[0].filename
     };
@@ -54,15 +54,15 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
                 }
             }
 		);
-		product.images = [...product.images,...imagePath];
+		food.images = [...food.images,...imagePath];
 	}
 
-	await product.save();
+	await food.save();
 
 	res.status(201).json({
 		status: "success",
 		success: true,
-		data: product,
+		data: food,
 		message: "Food type created successfully!",
 	});
 });
@@ -110,7 +110,7 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
 		];
 	}
 
-	const products = await foodType.find(filter)
+	const foods = await foodType.find(filter)
 		.skip(skip)
 		.limit(queryLimit)
 		.populate("createdBy", '-password')
@@ -125,10 +125,10 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
 		success: true,
 		status: "success",
 		data: {
-			data: products,
+			data: foods,
 			pagination,
 		},
-		message: "Products fetched successfully!",
+		message: "foods fetched successfully!",
 	});
 });
 

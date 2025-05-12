@@ -208,8 +208,8 @@ exports.resetPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __a
     }
     // Hash the new password and save it
     user.password = yield (0, bcrypt_utils_1.hash)(password);
-    user.resetPasswordToken = undefined; // Clear the reset token after use
-    user.resetPasswordExpires = undefined; // Clear the expiration time
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
     yield user.save();
     res.status(200).json({
         success: true,

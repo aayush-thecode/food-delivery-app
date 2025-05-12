@@ -253,8 +253,8 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
 
   // Hash the new password and save it
   user.password = await hash(password);
-  user.resetPasswordToken = undefined; // Clear the reset token after use
-  user.resetPasswordExpires = undefined; // Clear the expiration time
+  user.resetPasswordToken = undefined; 
+  user.resetPasswordExpires = undefined; 
   await user.save();
 
   res.status(200).json({
