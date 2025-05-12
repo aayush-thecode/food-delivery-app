@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -25,8 +36,12 @@ const crypto_1 = __importDefault(require("crypto"));
 // user registration 
 exports.register = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
+    const existingUser = yield users_model_1.default.findOne({ email: body.email });
+    if (existingUser) {
+        throw new errorhandeler_middleware_1.CustomError('Email already registered', 404);
+    }
     if (!body.password) {
-        throw new errorhandeler_middleware_1.CustomError('Password is required', 400);
+        throw new errorhandeler_middleware_1.CustomError('Password is required', 404);
     }
     const hashedPassword = yield (0, bcrypt_utils_1.hash)(body.password);
     body.password = hashedPassword;
@@ -87,7 +102,7 @@ exports.update = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
         addresses
     }, { new: true });
     if (!user) {
-        throw new errorhandeler_middleware_1.CustomError('user is required', 400);
+        throw new errorhandeler_middleware_1.CustomError('user is required', 404);
     }
     res.status(201).json({
         status: 'success',
@@ -100,45 +115,47 @@ exports.update = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
 exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email) {
-        throw new errorhandeler_middleware_1.CustomError('email is requied', 400);
+        throw new errorhandeler_middleware_1.CustomError('Email is required', 400);
     }
     if (!password) {
         throw new errorhandeler_middleware_1.CustomError('Password is required', 400);
     }
     const user = yield users_model_1.default.findOne({ email });
     if (!user) {
-        throw new errorhandeler_middleware_1.CustomError('Wrong credential provided', 400);
-        return;
+        throw new errorhandeler_middleware_1.CustomError('Invalid credentials', 401);
     }
-    //Compare hash 
     const isMatch = yield (0, bcrypt_utils_1.compare)(password, user.password);
     if (!isMatch) {
-        throw new errorhandeler_middleware_1.CustomError('Wrong credentials provided', 400);
+        throw new errorhandeler_middleware_1.CustomError('Invalid credentials', 401);
     }
     const payload = {
         _id: user._id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
     };
     const token = (0, jwt_utils_1.generateToken)(payload);
-    res.cookie('access_token', token, {
+    const _a = user.toObject(), { password: _ } = _a, userWithoutPassword = __rest(_a, ["password"]);
+    res
+        .cookie('access_token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
-    }).status(200).json({
-        status: "success",
+        secure: process.env.NODE_ENV === 'production',
+    })
+        .status(200)
+        .json({
+        status: 'success',
         success: true,
-        message: "Login successful",
-        token, user
+        message: 'Login successful',
+        user: userWithoutPassword,
     });
 }));
 //delete user by id 
 exports.deleteUserById = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const deleteId = req.params.id;
     const deleteUserId = yield users_model_1.default.findByIdAndDelete(deleteId);
-    if (!deleteId) {
-        throw new errorhandeler_middleware_1.CustomError('Id mismatched and cannot delete', 400);
+    if (!deleteUserId) {
+        throw new errorhandeler_middleware_1.CustomError('User not found or already deleted', 404);
     }
     res.status(201).json({
         status: 'success',
@@ -151,7 +168,7 @@ exports.deleteUserById = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __
 exports.forgotPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     if (!email) {
-        throw new errorhandeler_middleware_1.CustomError("Email is required", 400);
+        throw new errorhandeler_middleware_1.CustomError("Email is required", 404);
     }
     const user = yield users_model_1.default.findOne({ email });
     if (!user) {
@@ -179,7 +196,7 @@ exports.resetPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __a
     const { token } = req.params;
     const { password } = req.body;
     if (!password) {
-        throw new errorhandeler_middleware_1.CustomError('Password is required', 400);
+        throw new errorhandeler_middleware_1.CustomError('Password is required', 404);
     }
     const hashedToken = crypto_1.default.createHash('sha256').update(token).digest('hex');
     const user = yield users_model_1.default.findOne({
@@ -187,7 +204,7 @@ exports.resetPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __a
         resetPasswordExpires: { $gt: new Date() }, // Token is still valid
     });
     if (!user) {
-        throw new errorhandeler_middleware_1.CustomError('Invalid or expired reset token', 400);
+        throw new errorhandeler_middleware_1.CustomError('Invalid or expired reset token', 404);
     }
     // Hash the new password and save it
     user.password = yield (0, bcrypt_utils_1.hash)(password);

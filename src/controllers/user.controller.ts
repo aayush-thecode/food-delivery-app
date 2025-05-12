@@ -17,8 +17,14 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
         
         const body = req.body;
 
+        const existingUser = await User.findOne({ email: body.email });
+
+        if (existingUser) {
+             throw new CustomError('Email already registered', 404);
+          }
+
         if(!body.password) {
-            throw new CustomError('Password is required', 400 )
+            throw new CustomError('Password is required', 404 )
         }
         const hashedPassword = await hash(body.password)
 
@@ -99,7 +105,7 @@ export const update = asyncHandler(async (req:Request, res: Response) => {
     }, {new: true })
 
     if(!user) {
-        throw new CustomError('user is required', 400)
+        throw new CustomError('user is required', 404)
     }
 
     res.status(201).json ({
@@ -113,58 +119,55 @@ export const update = asyncHandler(async (req:Request, res: Response) => {
 
 //Login user 
 
-export const login = asyncHandler(async (req:Request, res: Response) => {
+export const login = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-    const { email, password } = req.body;
+  if (!email) {
+    throw new CustomError('Email is required', 400);
+  }
 
-    if(!email) {
-        throw new CustomError('email is requied', 400)
-    }
+  if (!password) {
+    throw new CustomError('Password is required', 400);
+  }
 
-    if (!password) {
-        throw new CustomError('Password is required', 400);
-    }
+  const user = await User.findOne({ email });
 
-    const user = await User.findOne({ email });
+  if (!user) {
+    throw new CustomError('Invalid credentials', 401);
+  }
 
-    if (!user) {
-        throw new CustomError('Wrong credential provided', 400)
+  const isMatch = await compare(password, user.password as string);
 
-        return;
-    }
+  if (!isMatch) {
+    throw new CustomError('Invalid credentials', 401);
+  }
 
+  const payload: IPayload = {
+    _id: user._id,
+    email: user.email as string,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    role: user.role,
+  };
 
-    //Compare hash 
+  const token = generateToken(payload);
 
-    const isMatch = await compare (password, user.password as string);
+  const { password: _, ...userWithoutPassword } = user.toObject();
 
-    if (!isMatch) {
-
-      throw new CustomError('Wrong credentials provided', 400)
-
-    }
-      const payload:IPayload = {
-          _id: user._id,
-          email: user.email as string,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role:user.role
-      }
-
-      const token = generateToken(payload);
-
-    res.cookie('access_token', token,{
-      
-      httpOnly:true,
-      secure: process.env.NODE_ENV === 'production'
-
-  }).status(200).json({
-    status: "success",
-    success: true,
-    message: "Login successful",
-    token,user
-  });
+  res
+    .cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    .status(200)
+    .json({
+      status: 'success',
+      success: true,
+      message: 'Login successful',
+      user: userWithoutPassword,
+    });
 });
+
 
 //delete user by id 
 
@@ -174,9 +177,9 @@ export const deleteUserById = asyncHandler( async(req: Request, res:Response) =>
     
     const deleteUserId = await User.findByIdAndDelete(deleteId)
     
-    if(!deleteId) {
+    if(!deleteUserId) {
       
-      throw new CustomError('Id mismatched and cannot delete', 400);
+      throw new CustomError('User not found or already deleted', 404);
     
     }
     
@@ -196,7 +199,7 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
   const { email } = req.body;
 
   if (!email) {
-    throw new CustomError("Email is required", 400);
+    throw new CustomError("Email is required", 404);
   }
 
   const user = await User.findOne({ email });
@@ -233,7 +236,7 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   const { password } = req.body;
 
   if (!password) {
-    throw new CustomError('Password is required', 400);
+    throw new CustomError('Password is required', 404);
   }
 
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
@@ -244,7 +247,7 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   });
 
   if (!user) {
-    throw new CustomError('Invalid or expired reset token', 400);
+    throw new CustomError('Invalid or expired reset token', 404);
   }
 
   // Hash the new password and save it
