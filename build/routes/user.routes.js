@@ -18,6 +18,7 @@ router.post('/login', user_controller_1.login);
 router.get('/', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), user_controller_1.getAllData);
 // Forgot password route
 router.post('/forgot-password', user_controller_1.forgotPassword);
+router.get('/reset-password/:token', user_controller_1.resetPassword);
 // Reset password route
-router.post('/reset-password/:token', user_controller_1.resetPassword);
+router.post('/reset-password/:token/submit', user_controller_1.resetPassword);
 exports.default = router;

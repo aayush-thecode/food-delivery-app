@@ -20,7 +20,9 @@ router.get('/', Authenticate(OnlyAdmin),getAllData)
 // Forgot password route
 router.post('/forgot-password', forgotPassword);
 
+router.get('/reset-password/:token', resetPassword); 
+
 // Reset password route
-router.post('/reset-password/:token', resetPassword);
+router.post('/reset-password/:token/submit', resetPassword);
 
 export default router;
