@@ -214,7 +214,8 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
   user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // valid for 15 minutes
   await user.save();
 
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+  const resetUrl = `${process.env.FRONTEND_URL || 'https://food-delivery-client-qv92.vercel.app'}/reset-password/${token}`;
+
   
   await sendEmail({
     to: user.email as string,

@@ -178,7 +178,7 @@ exports.forgotPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); // valid for 15 minutes
     yield user.save();
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'https://food-delivery-client-qv92.vercel.app'}/reset-password/${token}`;
     yield (0, sendemail_utils_1.sendEmail)({
         to: user.email,
         subject: 'Reset your password',
