@@ -3,19 +3,21 @@ import { create, getAll, getFoodById, remove, updateFood } from '../controllers/
 import multer from 'multer';
 import { Authenticate } from '../middleware/authentication.middleware';
 import { OnlyAdmin } from '../@types/global.types';
+import { cloudinary } from '../config/cloudinary.config';
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 
 const router = express.Router()
 
 //storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '/tmp/my-uploads')
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: 'food-delivery/foodtype',
+      allowed_formats: ['jpeg', 'jpg', 'png', 'webp'],
+    };
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix)
-  }
-})
+});
 
 const upload = multer({storage: storage})
 
@@ -37,7 +39,7 @@ updateFood);
 
 router.post('/',Authenticate(OnlyAdmin), upload.fields ([
   {
-    name: 'coverImages',
+    name: 'coverImage',
     maxCount: 1,
   },
   {

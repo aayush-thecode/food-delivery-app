@@ -24,11 +24,12 @@ const Authenticate = (roles) => {
                 throw new errorhandeler_middleware_1.CustomError("Unauthorized, Authorization token is missing", 401);
             }
             const access_token = authHeader.split(" ")[1];
+            console.log("🚀 ~ return ~ access_token:", access_token);
             if (!access_token) {
                 throw new errorhandeler_middleware_1.CustomError("Unauthorized, token is missing", 401);
             }
             const decoded = (0, jwt_utils_1.verifyToken)(access_token);
-            if (decoded.exp && decoded.exp * 1000 > Date.now()) {
+            if (decoded.exp && decoded.exp * 1000 < Date.now()) {
                 throw new errorhandeler_middleware_1.CustomError("Unauthorized, access denied", 401);
             }
             if (!decoded) {

@@ -11,7 +11,7 @@ import { getPaginationData } from "../utils/pagination.utils";
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
 
-    const { name, price, description, category: categoryId } = req.body;
+    const { name, price, description, category: categoryId} = req.body;
 	const admin = req.user;
 	const files = req.files as {
 		coverImage?: Express.Multer.File[];
@@ -24,6 +24,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 	const coverImage = files.coverImage;
 	const images = files.images;
 
+    
 	// get category
 	const category = await Category.findById(categoryId);
 

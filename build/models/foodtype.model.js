@@ -65,5 +65,5 @@ const foodSchema = new mongoose_1.default.Schema({
         default: 0
     }
 }, { timestamps: true });
-const foodType = mongoose_1.default.model('foodType', foodSchema);
+const foodType = mongoose_1.default.model('foodtype', foodSchema);
 exports.default = foodType;

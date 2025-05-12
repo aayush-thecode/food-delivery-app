@@ -23,6 +23,8 @@ export const Authenticate = (
 			}
 
 			const access_token = authHeader.split(" ")[1];
+			
+			console.log("🚀 ~ return ~ access_token:", access_token)
 
 			if (!access_token) {
 				throw new CustomError("Unauthorized, token is missing", 401);
@@ -30,7 +32,7 @@ export const Authenticate = (
 
 			const decoded = verifyToken(access_token);
 
-			if (decoded.exp && decoded.exp * 1000 > Date.now()) {
+			if (decoded.exp && decoded.exp * 1000 < Date.now()) {
 				throw new CustomError("Unauthorized, access denied", 401);
 			}
 
