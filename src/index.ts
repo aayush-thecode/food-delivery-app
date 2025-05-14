@@ -19,8 +19,10 @@ connectDatabase(DB_URI)
 
 
 //using middleware
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 app.use(cors({
-    origin: '*'
+    origin: FRONTEND_URL,
 }));
 app.use(express.urlencoded({extended: false }));
 app.use(express.json());
@@ -33,7 +35,7 @@ app.use('/api/uploads',express.static(path.join(__dirname,'../', 'uploads')))
 
 //using routes
 app.use('/api/user', userRoutes)
-app.use('/api/foodtype', foodTypeRoutes)
+app.use('/api/menu', foodTypeRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/review', reviewRoutes)
 

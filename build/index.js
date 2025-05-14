@@ -18,8 +18,9 @@ const DB_URI = process.env.DB_URI || '';
 const PORT = process.env.PORT || 8080;
 (0, databse_config_1.default)(DB_URI);
 //using middleware
+const FRONTEND_URL = process.env.FRONTEND_URL;
 app.use((0, cors_1.default)({
-    origin: '*'
+    origin: FRONTEND_URL,
 }));
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
@@ -27,7 +28,7 @@ app.use(express_1.default.json());
 app.use('/api/uploads', express_1.default.static(path_1.default.join(__dirname, '../', 'uploads')));
 //using routes
 app.use('/api/user', user_routes_1.default);
-app.use('/api/foodtype', foodtype_routes_1.default);
+app.use('/api/menu', foodtype_routes_1.default);
 app.use('/api/category', category_routes_1.default);
 app.use('/api/review', review_routes_1.default);
 //health check route
