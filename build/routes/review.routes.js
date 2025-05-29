@@ -11,7 +11,7 @@ const router = express_1.default.Router();
 //create review
 router.post('/', (0, authentication_middleware_1.Authenticate)(global_types_1.onlyUser), review_food_controller_1.createFoodReview);
 // get all reviews
-router.get('/', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), review_food_controller_1.getAllFoodReview);
+router.get('/', review_food_controller_1.getAllFoodReview);
 //update review
 router.put('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.onlyUser), review_food_controller_1.UpdateReview);
 //get user review by foodtype id

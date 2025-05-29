@@ -10,7 +10,7 @@ const router: Router = express.Router();
 router.post('/', Authenticate(onlyUser), createFoodReview);
 
 // get all reviews
-router.get('/', Authenticate(OnlyAdmin), getAllFoodReview);
+router.get('/', getAllFoodReview);
 
 //update review
 router.put('/:id', Authenticate(onlyUser), UpdateReview);
