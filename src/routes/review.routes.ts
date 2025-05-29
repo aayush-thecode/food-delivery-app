@@ -1,6 +1,6 @@
 import express, { Router } from 'express'
 import { Authenticate } from '../middleware/authentication.middleware';
-import { OnlyAdmin, onlyUser } from '../@types/global.types';
+import { onlyUser } from '../@types/global.types';
 import { createFoodReview, deleteFoodReviewById, getAllFoodReview, getReviewId, UpdateReview } from '../controllers/review.food.controller';
 
 

@@ -15,7 +15,7 @@ router.get('/', review_food_controller_1.getAllFoodReview);
 //update review
 router.put('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.onlyUser), review_food_controller_1.UpdateReview);
 //get user review by foodtype id
-router.get('/:id', (0, authentication_middleware_1.Authenticate)(global_types_1.OnlyAdmin), review_food_controller_1.getReviewId);
+router.get('/:id', review_food_controller_1.getReviewId);
 //delete review by Id
 router.delete('/:id', review_food_controller_1.deleteFoodReviewById);
 exports.default = router;
