@@ -141,6 +141,8 @@ exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(v
         .cookie('access_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for prod, 'lax' for localhost
+        maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
     })
         .status(200)
         .json({
