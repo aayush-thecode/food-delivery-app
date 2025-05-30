@@ -8,6 +8,7 @@ import categoryRoutes from './routes/category.routes'
 import reviewRoutes from './routes/review.routes'
 import { CustomError } from './middleware/errorhandeler.middleware';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 
 const app = express();
@@ -22,8 +23,11 @@ connectDatabase(DB_URI)
 // const FRONTEND_URL = process.env.FRONTEND_URL;
 
 app.use(cors({
-    origin: '*', 
+    // origin: '*', 
+    origin: 'http://localhost:3000',
+    credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.urlencoded({extended: false }));
 app.use(express.json());
 

@@ -13,6 +13,7 @@ const category_routes_1 = __importDefault(require("./routes/category.routes"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
 const errorhandeler_middleware_1 = require("./middleware/errorhandeler.middleware");
 const cors_1 = __importDefault(require("cors"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
 const DB_URI = process.env.DB_URI || '';
 const PORT = process.env.PORT || 8080;
@@ -20,8 +21,11 @@ const PORT = process.env.PORT || 8080;
 //using middleware
 // const FRONTEND_URL = process.env.FRONTEND_URL;
 app.use((0, cors_1.default)({
-    origin: '*',
+    // origin: '*', 
+    origin: 'http://localhost:3000',
+    credentials: true,
 }));
+app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
 //serving static files
