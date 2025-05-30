@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 8080;
 //using middleware
 const FRONTEND_URL = process.env.FRONTEND_URL;
 app.use((0, cors_1.default)({
-    origin: FRONTEND_URL || '*',
+    origin: '*',
 }));
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
