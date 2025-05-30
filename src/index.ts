@@ -19,7 +19,7 @@ connectDatabase(DB_URI)
 
 
 //using middleware
-const FRONTEND_URL = process.env.FRONTEND_URL;
+// const FRONTEND_URL = process.env.FRONTEND_URL;
 
 app.use(cors({
     origin: '*', 

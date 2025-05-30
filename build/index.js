@@ -18,7 +18,7 @@ const DB_URI = process.env.DB_URI || '';
 const PORT = process.env.PORT || 8080;
 (0, databse_config_1.default)(DB_URI);
 //using middleware
-const FRONTEND_URL = process.env.FRONTEND_URL;
+// const FRONTEND_URL = process.env.FRONTEND_URL;
 app.use((0, cors_1.default)({
     origin: '*',
 }));
