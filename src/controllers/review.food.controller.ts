@@ -23,7 +23,7 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     const food = await foodType.findById(foodTypeId);
 
-    if(!foodTypeId) {
+    if(!food) {
 
         throw new CustomError('food Type not fpund', 404);
 
@@ -31,13 +31,13 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     const newReview = await Review.create({...body, foodType: foodTypeId, user:userId})
 
-    foodTypeId.reviews.push(newReview._id)
+    food.reviews.push(newReview._id)
 
     const totalRating: number = (food?.averageRating as number * (foodTypeId.reviews.length + 1)) + Number(rating); 
 
     foodTypeId.averageRating = totalRating / foodTypeId.reviews.length 
 
-    await food?.save() 
+    await food.save(); 
 
     res.status(201).json({
         status: 'success',
