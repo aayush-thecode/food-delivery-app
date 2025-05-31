@@ -13,16 +13,15 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     const body = req.body;
     const user = req.user;
+    const { foodId, rating } = body;
 
-    const { foodTypeId, rating } = body;
+    if(!foodId) {
 
-    if(!foodTypeId) {
-
-        throw new CustomError('user Id and Food type Id is required', 400);
+        throw new CustomError('Food Id is required', 400);
 
     }
 
-    const food = await foodType.findById(foodTypeId);
+    const food = await foodType.findById(foodId);
 
     if(!food) {
 
@@ -30,7 +29,7 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     }
 
-    const newReview = await Review.create({...body, food: foodTypeId, user:user._id});
+    const newReview = await Review.create({...body, food: foodId, user:user._id});
 
     food.reviews.push(newReview._id)
 

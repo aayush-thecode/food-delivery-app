@@ -22,15 +22,15 @@ const pagination_utils_1 = require("../utils/pagination.utils");
 exports.createFoodReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const user = req.user;
-    const { foodTypeId, rating } = body;
-    if (!foodTypeId) {
-        throw new errorhandeler_middleware_1.CustomError('user Id and Food type Id is required', 400);
+    const { foodId, rating } = body;
+    if (!foodId) {
+        throw new errorhandeler_middleware_1.CustomError('Food Id is required', 400);
     }
-    const food = yield foodtype_model_1.default.findById(foodTypeId);
+    const food = yield foodtype_model_1.default.findById(foodId);
     if (!food) {
         throw new errorhandeler_middleware_1.CustomError('food Type not found', 404);
     }
-    const newReview = yield review_food_model_1.default.create(Object.assign(Object.assign({}, body), { food: foodTypeId, user: user._id }));
+    const newReview = yield review_food_model_1.default.create(Object.assign(Object.assign({}, body), { food: foodId, user: user._id }));
     food.reviews.push(newReview._id);
     const totalRating = ((food === null || food === void 0 ? void 0 : food.averageRating) * (food.reviews.length - 1)) + Number(rating);
     food.averageRating = totalRating / food.reviews.length;
