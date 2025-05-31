@@ -155,10 +155,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const { password: _, ...userWithoutPassword } = user.toObject();
 
   res.cookie('access_token', token, {
-      httpOnly: true,
+      // httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' for prod, 'lax' for localhost
-      maxAge: 24 * 60 * 60 * 1000,  // 1 day expiration
+      // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' for prod, 'lax' for localhost
+      // maxAge: 24 * 60 * 60 * 1000,  // 1 day expiration
     })
     .status(200)
     .json({
