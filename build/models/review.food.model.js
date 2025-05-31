@@ -19,7 +19,7 @@ const reviewSchema = new mongoose_1.default.Schema({
     user: {
         type: mongoose_1.default.Types.ObjectId,
         required: [true, 'user is required'],
-        ref: 'foodyypes'
+        ref: 'user'
     },
 }, { timestamps: true });
 const Review = mongoose_1.default.model('review', reviewSchema);

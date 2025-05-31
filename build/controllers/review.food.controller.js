@@ -28,9 +28,9 @@ exports.createFoodReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => 
     }
     const food = yield foodtype_model_1.default.findById(foodTypeId);
     if (!food) {
-        throw new errorhandeler_middleware_1.CustomError('food Type not fpund', 404);
+        throw new errorhandeler_middleware_1.CustomError('food Type not found', 404);
     }
-    const newReview = yield review_food_model_1.default.create(Object.assign(Object.assign({}, body), { food: foodTypeId, user: user._Id }));
+    const newReview = yield review_food_model_1.default.create(Object.assign(Object.assign({}, body), { food: foodTypeId, user: user._id }));
     food.reviews.push(newReview._id);
     const totalRating = ((food === null || food === void 0 ? void 0 : food.averageRating) * (food.reviews.length - 1)) + Number(rating);
     food.averageRating = totalRating / food.reviews.length;
@@ -44,54 +44,35 @@ exports.createFoodReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => 
 }));
 // getAll food review data 
 exports.getAllFoodReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { rating, page, limit, query, foodType } = req.query;
-    const currentPage = parseInt(page) || 1;
-    const queryLimit = parseInt(limit) || 10;
-    const skip = (currentPage - 1) * queryLimit;
+    const { food, page, limit, } = req.query;
     let filter = {};
-    if (rating) {
-        filter.rating = parseInt(rating);
-    }
-    if (foodType) {
-        filter.foodType = foodType;
-    }
-    if (query) {
-        filter.$or = [
-            {
-                review: { $regex: query, $options: 'i' },
-            }
-        ];
+    const perPage = parseInt(limit) || 10;
+    const currentPage = parseInt(page) || 1;
+    const skip = (currentPage - 1) * perPage;
+    if (food) {
+        filter.food = food;
     }
     const reviews = yield review_food_model_1.default.find(filter)
         .skip(skip)
-        .limit(queryLimit)
+        .limit(perPage)
         .sort({ createdAt: -1 })
-        .populate('fooditems.foodtype')
-        .populate('user');
+        .populate("user")
+        .populate("food");
     const totalCount = yield review_food_model_1.default.countDocuments(filter);
-    const pagination = (0, pagination_utils_1.getPaginationData)(currentPage, queryLimit, totalCount);
     res.status(200).json({
         success: true,
-        status: 'success',
+        status: "success",
         data: {
             data: reviews,
-            pagination,
+            pagination: (0, pagination_utils_1.getPaginationData)(currentPage, perPage, totalCount),
         },
-        message: 'review fetched successfully!'
+        message: "Reviews fetched successfully!",
     });
 }));
 //get reviews by food type Id 
 exports.getReviewId = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { foodId } = req.params;
-    if (!foodId) {
-        throw new errorhandeler_middleware_1.CustomError('review data not found', 400);
-    }
-    const food = yield review_food_model_1.default.findById(foodId);
-    if (!food) {
-        throw new errorhandeler_middleware_1.CustomError('food not found', 404);
-    }
-    // find reviews for the given foodId 
-    const reviews = yield review_food_model_1.default.find({ food: foodId });
+    const foodId = req.params.foodId;
+    const reviews = yield review_food_model_1.default.find({ food: foodId }).populate("user");
     res.status(200).json({
         status: 'success',
         success: true,
@@ -101,15 +82,15 @@ exports.getReviewId = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awa
 }));
 //update review by food id 
 exports.UpdateReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { rating, ReviewId, foodId, comment } = req.body;
-    if (!ReviewId || !foodId) {
+    const { rating, reviewId, foodId, comment } = req.body;
+    if (!reviewId || !foodId) {
         throw new errorhandeler_middleware_1.CustomError('product Id and food Id is required', 400);
     }
     const food = yield foodtype_model_1.default.findById(foodId);
     if (!food) {
         throw new errorhandeler_middleware_1.CustomError('Food not found', 404);
     }
-    const review = yield review_food_model_1.default.findById(ReviewId);
+    const review = yield review_food_model_1.default.findById(reviewId);
     if (!review) {
         throw new errorhandeler_middleware_1.CustomError('Review not found', 404);
     }
@@ -122,7 +103,7 @@ exports.UpdateReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __aw
         review.review = comment;
     yield review.save();
     //update the average rating 
-    const totalRating = ((food === null || food === void 0 ? void 0 : food.averageRating) * food.reviews.length - oldRating + rating) / food.reviews.length;
+    const totalRating = ((food.averageRating * food.reviews.length) - oldRating + rating) / food.reviews.length;
     food.averageRating = totalRating;
     yield food.save();
     res.status(200).json({
@@ -147,7 +128,7 @@ exports.deleteFoodReviewById = (0, asyncHandler_utils_1.asyncHandler)((req, res)
         throw new errorhandeler_middleware_1.CustomError("review not found", 404);
     }
     yield review_food_model_1.default.findByIdAndDelete(review._id);
-    food.reviews.pull(food.reviews.filter((id) => id.toString() !== review._id.toString()));
+    food.reviews.pull(review._id);
     // recalculate average rating
     if (food.reviews.length === 0) {
         food.averageRating = 0;

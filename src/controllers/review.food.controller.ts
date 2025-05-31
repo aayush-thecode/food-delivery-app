@@ -26,11 +26,11 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     if(!food) {
 
-        throw new CustomError('food Type not fpund', 404);
+        throw new CustomError('food Type not found', 404);
 
     }
 
-    const newReview = await Review.create({...body, food: foodTypeId, user:user._Id});
+    const newReview = await Review.create({...body, food: foodTypeId, user:user._id});
 
     food.reviews.push(newReview._id)
 
@@ -54,50 +54,33 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
 export const getAllFoodReview = asyncHandler(async (req: Request, res: Response) => {
 
-    const {rating, page, limit, query, foodType} = req.query;
-
-    const currentPage = parseInt(page as string) || 1;
-    const queryLimit = parseInt(limit as string) || 10;
-    const skip = (currentPage - 1) * queryLimit;
-
+    const {food, page, limit, } = req.query;
     let filter: Record<string, any> = {};
+	const perPage = parseInt(limit as string) || 10;
+	const currentPage = parseInt(page as string) || 1;
+	const skip = (currentPage - 1) * perPage;
 
-    if(rating) {
-        filter.rating = parseInt(rating as string);
-    }
-
-    if(foodType) {
-        filter.foodType = foodType;
-    }
-
-    if(query) {
-        filter.$or = [
-            {
-                review: { $regex: query, $options: 'i'},
-            }
-        ];
+    if(food) {
+        filter.food = food;
     }
 
     const reviews = await Review.find(filter)
-    .skip(skip)
-    .limit(queryLimit)
-    .sort({ createdAt: -1 })
-    .populate('fooditems.foodtype')
-    .populate('user');
+        .skip(skip)
+        .limit(perPage)
+        .sort({ createdAt: -1 })
+        .populate("user")
+        .populate("food")
 
     const totalCount = await Review.countDocuments(filter);
 
-    const pagination = getPaginationData(currentPage, queryLimit, totalCount);
-
-
-    res.status(200).json ({
-        success:true,
-        status:'success',
+    res.status(200).json({
+        success: true,
+        status: "success",
         data: {
             data: reviews,
-            pagination,
+            pagination: getPaginationData(currentPage, perPage, totalCount),
         },
-        message: 'review fetched successfully!'
+        message: "Reviews fetched successfully!",
     })
 });
 
@@ -106,26 +89,8 @@ export const getAllFoodReview = asyncHandler(async (req: Request, res: Response)
 
 export const getReviewId = asyncHandler(async (req:Request, res: Response) => {
 
-    const {foodId} = req.params;
-
-
-    if(!foodId) {
-        
-        throw new CustomError('review data not found', 400)
-
-    }
-
-    const food = await Review.findById(foodId) 
-
-    if(!food) {
-
-        throw new CustomError('food not found', 404);
-
-    }
-
-    // find reviews for the given foodId 
-
-    const reviews = await Review.find({food: foodId})
+    const foodId = req.params.foodId;
+    const reviews = await Review.find({ food: foodId}).populate("user");
 
     res.status(200).json ({
 
@@ -133,7 +98,6 @@ export const getReviewId = asyncHandler(async (req:Request, res: Response) => {
         success: true,
         message: 'review data fetched successfully!',
         data: reviews,
-
     })
 })
 
@@ -142,9 +106,9 @@ export const getReviewId = asyncHandler(async (req:Request, res: Response) => {
 
 export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
 
-    const {rating, ReviewId, foodId, comment} = req.body;
+    const {rating, reviewId, foodId, comment} = req.body;
 
-    if(!ReviewId || !foodId) {
+    if(!reviewId || !foodId) {
         
         throw new CustomError('product Id and food Id is required', 400)
 
@@ -158,7 +122,7 @@ export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
 
     }
 
-    const review = await Review.findById(ReviewId)
+    const review = await Review.findById(reviewId)
 
     if(!review) {
 
@@ -180,7 +144,8 @@ export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
 
     //update the average rating 
 
-    const totalRating = (food?.averageRating as number * food.reviews.length - oldRating + rating) / food.reviews.length 
+    const totalRating = ((food.averageRating as number * food.reviews.length) - oldRating + rating) / food.reviews.length;
+
 
     food.averageRating = totalRating
 
@@ -228,7 +193,8 @@ export const deleteFoodReviewById = asyncHandler(async (req:Request, res: Respon
 
     await Review.findByIdAndDelete(review._id);
 
-    food.reviews.pull(food.reviews.filter((id) => id.toString() !== review._id.toString()))
+    food.reviews.pull(review._id);
+
 
     // recalculate average rating
     

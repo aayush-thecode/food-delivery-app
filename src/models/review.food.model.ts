@@ -16,7 +16,7 @@ const reviewSchema = new mongoose.Schema ({
     user: {
         type: mongoose.Types.ObjectId,
         required: [true, 'user is required'],
-        ref: 'foodyypes'
+        ref: 'user'
     },
     
 },{timestamps:true})
