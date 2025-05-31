@@ -12,10 +12,11 @@ import { getPaginationData } from "../utils/pagination.utils";
 export const createFoodReview = asyncHandler(async (req:Request, res: Response) => {
 
     const body = req.body;
+    const user = req.user;
 
-    const { userId, foodTypeId, rating } = body;
+    const { foodTypeId, rating } = body;
 
-    if(!userId || !foodTypeId) {
+    if(!foodTypeId) {
 
         throw new CustomError('user Id and Food type Id is required', 400);
 
@@ -29,13 +30,13 @@ export const createFoodReview = asyncHandler(async (req:Request, res: Response) 
 
     }
 
-    const newReview = await Review.create({...body, foodType: foodTypeId, user:userId})
+    const newReview = await Review.create({...body, food: foodTypeId, user:user._Id});
 
     food.reviews.push(newReview._id)
 
-    const totalRating: number = (food?.averageRating as number * (foodTypeId.reviews.length + 1)) + Number(rating); 
+    const totalRating: number = (food?.averageRating as number * (food.reviews.length - 1)) + Number(rating); 
 
-    foodTypeId.averageRating = totalRating / foodTypeId.reviews.length 
+    food.averageRating = totalRating / food.reviews.length 
 
     await food.save(); 
 

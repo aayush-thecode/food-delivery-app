@@ -21,18 +21,19 @@ const pagination_utils_1 = require("../utils/pagination.utils");
 // create new food review 
 exports.createFoodReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const { userId, foodTypeId, rating } = body;
-    if (!userId || !foodTypeId) {
+    const user = req.user;
+    const { foodTypeId, rating } = body;
+    if (!foodTypeId) {
         throw new errorhandeler_middleware_1.CustomError('user Id and Food type Id is required', 400);
     }
     const food = yield foodtype_model_1.default.findById(foodTypeId);
     if (!food) {
         throw new errorhandeler_middleware_1.CustomError('food Type not fpund', 404);
     }
-    const newReview = yield review_food_model_1.default.create(Object.assign(Object.assign({}, body), { foodType: foodTypeId, user: userId }));
+    const newReview = yield review_food_model_1.default.create(Object.assign(Object.assign({}, body), { food: foodTypeId, user: user._Id }));
     food.reviews.push(newReview._id);
-    const totalRating = ((food === null || food === void 0 ? void 0 : food.averageRating) * (foodTypeId.reviews.length + 1)) + Number(rating);
-    foodTypeId.averageRating = totalRating / foodTypeId.reviews.length;
+    const totalRating = ((food === null || food === void 0 ? void 0 : food.averageRating) * (food.reviews.length - 1)) + Number(rating);
+    food.averageRating = totalRating / food.reviews.length;
     yield food.save();
     res.status(201).json({
         status: 'success',
