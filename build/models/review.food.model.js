@@ -21,6 +21,11 @@ const reviewSchema = new mongoose_1.default.Schema({
         required: [true, 'user is required'],
         ref: 'user'
     },
+    food: {
+        type: mongoose_1.default.Types.ObjectId,
+        required: [true, "Food is required"],
+        ref: "foodtype",
+    }
 }, { timestamps: true });
 const Review = mongoose_1.default.model('review', reviewSchema);
 exports.default = Review;
