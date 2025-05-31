@@ -21,7 +21,7 @@ const reviewSchema = new mongoose.Schema ({
     food: {
         type: mongoose.Types.ObjectId,
         required: [true, "Food is required"],
-        ref: "foodtype",
+        ref: "food",
     }
     
 },{timestamps:true})
