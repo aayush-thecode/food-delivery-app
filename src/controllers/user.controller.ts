@@ -152,7 +152,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
   const token = generateToken(payload);
 
-  const { password: _, ...userWithoutPassword } = user.toObject();
+  // const { password: _, ...userWithoutPassword } = user.toObject();
 
   res.cookie('access_token', token, {
       // httpOnly: true,
@@ -165,7 +165,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       status: 'success',
       success: true,
       message: 'Login successful',
-      user: userWithoutPassword,
+      user, token,
     });
 });
 
