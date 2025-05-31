@@ -137,8 +137,7 @@ exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(v
     };
     const token = (0, jwt_utils_1.generateToken)(payload);
     const _a = user.toObject(), { password: _ } = _a, userWithoutPassword = __rest(_a, ["password"]);
-    res
-        .cookie('access_token', token, {
+    res.cookie('access_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for prod, 'lax' for localhost
