@@ -107,26 +107,32 @@ export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
 
     const {rating, reviewId, foodId, comment} = req.body;
 
+    
+    
     if(!reviewId || !foodId) {
         
         throw new CustomError('product Id and food Id is required', 400)
-
+        
     }
-
+    
     const food = await foodType.findById(foodId);
-
+    
     if(!food) {
         
         throw new CustomError('Food not found', 404); 
-
+        
     }
-
+    
     const review = await Review.findById(reviewId)
-
+    
     if(!review) {
-
+        
         throw new CustomError('Review not found', 404);
-
+        
+    }
+    
+    if (review.user.toString() !== req.user._id.toString()) {
+        throw new CustomError("Not authorized to modify this review", 403);
     }
 
     //store the old rating before updating new review 
@@ -135,7 +141,13 @@ export const UpdateReview = asyncHandler(async (req:Request, res: Response) => {
 
     //update review feilds
 
-    if(rating !== undefined) review.rating = rating;
+    if (rating !== undefined) {
+        const totalRating = ((food.averageRating as number * food.reviews.length) - oldRating + rating) / food.reviews.length;
+
+        food.averageRating = totalRating;
+
+        await food.save();
+    }
 
     if(comment !== undefined) review.review = comment;
 
@@ -166,8 +178,6 @@ export const deleteFoodReviewById = asyncHandler(async (req:Request, res: Respon
 
     const { userId, foodId} = req.body;
 
- 
-
     if(!userId || !foodId) {
        
         throw new CustomError('food Id and user Id are required', 400);
@@ -192,22 +202,28 @@ export const deleteFoodReviewById = asyncHandler(async (req:Request, res: Respon
 
     await Review.findByIdAndDelete(review._id);
 
+    if (review.user.toString() !== req.user._id.toString()) {
+
+        throw new CustomError("Not authorized to modify this review", 403);
+        
+    }
+
     food.reviews.pull(review._id);
 
+    const remainingReviews = food.reviews.length;
 
     // recalculate average rating
     
-    if (food.reviews.length === 0) {
+    if (remainingReviews === 0) {
 
-        food.averageRating = 0;
+    food.averageRating = 0;
 
     } else {
 
-        const totalRating = (food.averageRating as number * (food.reviews.length + 1)) - review.rating;
-
-        food.averageRating = totalRating / food.reviews.length; 
-        
-    }
+    const totalRating = (food.averageRating as number * (remainingReviews + 1)) - review.rating;
+    
+    food.averageRating = totalRating / remainingReviews;
+}
 
     await food.save();
 

@@ -22,7 +22,6 @@ const PORT = process.env.PORT || 8080;
 // const FRONTEND_URL = process.env.FRONTEND_URL;
 app.use((0, cors_1.default)({
     origin: '*',
-    // origin: 'http://localhost:3000',
     credentials: true,
 }));
 // app.use(cookieParser());

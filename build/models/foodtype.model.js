@@ -23,7 +23,7 @@ const foodSchema = new mongoose_1.default.Schema({
     description: {
         type: String,
         required: false,
-        min: [50, 'description should be atleast 50 character long'],
+        minlength: [100, 'description should be atleast 50 character long'],
         trim: true,
     },
     coverImage: {

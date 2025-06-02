@@ -24,7 +24,7 @@ const reviewSchema = new mongoose_1.default.Schema({
     food: {
         type: mongoose_1.default.Types.ObjectId,
         required: [true, "Food is required"],
-        ref: "food",
+        ref: "foodtype",
     }
 }, { timestamps: true });
 const Review = mongoose_1.default.model('review', reviewSchema);

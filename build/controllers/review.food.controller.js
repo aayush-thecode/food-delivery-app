@@ -94,11 +94,17 @@ exports.UpdateReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __aw
     if (!review) {
         throw new errorhandeler_middleware_1.CustomError('Review not found', 404);
     }
+    if (review.user.toString() !== req.user._id.toString()) {
+        throw new errorhandeler_middleware_1.CustomError("Not authorized to modify this review", 403);
+    }
     //store the old rating before updating new review 
     const oldRating = review.rating;
     //update review feilds
-    if (rating !== undefined)
-        review.rating = rating;
+    if (rating !== undefined) {
+        const totalRating = ((food.averageRating * food.reviews.length) - oldRating + rating) / food.reviews.length;
+        food.averageRating = totalRating;
+        yield food.save();
+    }
     if (comment !== undefined)
         review.review = comment;
     yield review.save();
@@ -128,14 +134,18 @@ exports.deleteFoodReviewById = (0, asyncHandler_utils_1.asyncHandler)((req, res)
         throw new errorhandeler_middleware_1.CustomError("review not found", 404);
     }
     yield review_food_model_1.default.findByIdAndDelete(review._id);
+    if (review.user.toString() !== req.user._id.toString()) {
+        throw new errorhandeler_middleware_1.CustomError("Not authorized to modify this review", 403);
+    }
     food.reviews.pull(review._id);
+    const remainingReviews = food.reviews.length;
     // recalculate average rating
-    if (food.reviews.length === 0) {
+    if (remainingReviews === 0) {
         food.averageRating = 0;
     }
     else {
-        const totalRating = (food.averageRating * (food.reviews.length + 1)) - review.rating;
-        food.averageRating = totalRating / food.reviews.length;
+        const totalRating = (food.averageRating * (remainingReviews + 1)) - review.rating;
+        food.averageRating = totalRating / remainingReviews;
     }
     yield food.save();
     res.status(200).json({
