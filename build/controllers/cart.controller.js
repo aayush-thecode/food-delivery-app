@@ -67,6 +67,7 @@ exports.getCartByUserId = (0, asyncHandler_utils_1.asyncHandler)((req, res) => _
 }));
 //clear cart 
 exports.clearCart = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('User from clearCart:', req.user);
     const userId = req.params._id;
     const cart = yield cart_model_1.Cart.findOne({ user: userId });
     if (!cart) {
