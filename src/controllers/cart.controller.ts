@@ -77,12 +77,6 @@ export const getCartByUserId = asyncHandler(async(req:Request, res: Response) =>
 
 export const clearCart = asyncHandler(async(req: Request, res: Response) => {
 
-    const foodId = req.params.foodId
-
-    if(!foodId) {
-        throw new CustomError('food not found', 404)
-    }
-
     const userId = req.params._id
  
     const cart = await Cart.findOne({user: userId})
@@ -100,3 +94,4 @@ export const clearCart = asyncHandler(async(req: Request, res: Response) => {
         data: null
     })
 });
+
