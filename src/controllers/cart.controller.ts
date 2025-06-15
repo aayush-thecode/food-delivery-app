@@ -9,7 +9,9 @@ import foodType from "../models/foodtype.model";
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
 
-    const {userId, quantity, foodId } = req.body;
+    const { quantity, foodId } = req.body;
+
+    const userId = req.user._id;
 
     let cart 
 

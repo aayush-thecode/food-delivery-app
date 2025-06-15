@@ -19,7 +19,8 @@ const cart_model_1 = require("../models/cart.model");
 const foodtype_model_1 = __importDefault(require("../models/foodtype.model"));
 //create
 exports.create = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, quantity, foodId } = req.body;
+    const { quantity, foodId } = req.body;
+    const userId = req.user._id;
     let cart;
     if (!userId) {
         throw new errorhandeler_middleware_1.CustomError('userId is required', 404);
