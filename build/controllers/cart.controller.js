@@ -57,7 +57,7 @@ exports.getCartByUserId = (0, asyncHandler_utils_1.asyncHandler)((req, res) => _
     const userId = req.params.id;
     const cart = yield cart_model_1.Cart.findOne({ user: userId })
         .populate('user', '-password')
-        .populate('items.food');
+        .populate('fooditems.food');
     res.status(200).json({
         status: 'success',
         success: true,
