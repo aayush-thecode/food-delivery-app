@@ -16,7 +16,7 @@ router.get('/', getAllFoodReview);
 router.put('/:id', Authenticate(onlyUser), UpdateReview);
 
 //get user review by foodtype id
-router.get('/:id', getReviewId);
+router.get('/menu/:foodId', getReviewId);
 
 //delete review by Id
 router.delete('/:id', deleteFoodReviewById)
