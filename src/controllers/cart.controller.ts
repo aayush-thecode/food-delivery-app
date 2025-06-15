@@ -77,7 +77,7 @@ export const getCartByUserId = asyncHandler(async(req:Request, res: Response) =>
 
 export const clearCart = asyncHandler(async(req: Request, res: Response) => {
     console.log('User from clearCart:', req.user); 
-    const userId = req.params._id;
+    const userId = req.user._id;
  
     const cart = await Cart.findOne({user: userId})
 
