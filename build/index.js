@@ -11,6 +11,7 @@ const foodtype_routes_1 = __importDefault(require("./routes/foodtype.routes"));
 const path_1 = __importDefault(require("path"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
+const cart_routes_1 = __importDefault(require("./routes/cart.routes"));
 const errorhandeler_middleware_1 = require("./middleware/errorhandeler.middleware");
 const cors_1 = __importDefault(require("cors"));
 // import cookieParser from 'cookie-parser';
@@ -34,6 +35,7 @@ app.use('/api/user', user_routes_1.default);
 app.use('/api/menu', foodtype_routes_1.default);
 app.use('/api/category', category_routes_1.default);
 app.use('/api/review', review_routes_1.default);
+app.use('/api/cart', cart_routes_1.default);
 //health check route
 app.use('/', (req, res) => {
     res.status(200).json({ message: 'server is up & running' });

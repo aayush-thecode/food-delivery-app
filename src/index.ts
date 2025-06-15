@@ -6,6 +6,7 @@ import foodTypeRoutes from './routes/foodtype.routes'
 import path from 'path';
 import categoryRoutes from './routes/category.routes'
 import reviewRoutes from './routes/review.routes'
+import cartRoutes from './routes/cart.routes';
 import { CustomError } from './middleware/errorhandeler.middleware';
 import cors from 'cors';
 // import cookieParser from 'cookie-parser';
@@ -41,6 +42,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/menu', foodTypeRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/review', reviewRoutes)
+app.use('/api/cart', cartRoutes);
 
 //health check route
 app.use('/',(req:Request, res:Response) => {
