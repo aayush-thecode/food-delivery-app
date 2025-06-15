@@ -39,7 +39,6 @@ exports.create = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
     console.log("🚀 ~ create ~ existingfood:", existingfood);
     if (existingfood) {
         existingfood.quantity += Number(quantity);
-        cart.fooditems.push(existingfood);
     }
     else {
         cart.fooditems.push({ food: foodId, quantity });

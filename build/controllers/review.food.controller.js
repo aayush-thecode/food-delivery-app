@@ -56,8 +56,8 @@ exports.getAllFoodReview = (0, asyncHandler_utils_1.asyncHandler)((req, res) => 
         .skip(skip)
         .limit(perPage)
         .sort({ createdAt: -1 })
-        .populate("user")
-        .populate("food");
+        .populate("user", "firstName lastName email _id")
+        .populate("food", "name _id");
     const totalCount = yield review_food_model_1.default.countDocuments(filter);
     res.status(200).json({
         success: true,
