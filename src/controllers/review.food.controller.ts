@@ -67,8 +67,8 @@ export const getAllFoodReview = asyncHandler(async (req: Request, res: Response)
         .skip(skip)
         .limit(perPage)
         .sort({ createdAt: -1 })
-        .populate("user")
-        .populate("food")
+        .populate("user", "firstName lastName email _id")
+        .populate("food", "name _id");
 
     const totalCount = await Review.countDocuments(filter);
 
