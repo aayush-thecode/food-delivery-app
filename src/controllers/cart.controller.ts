@@ -63,7 +63,7 @@ export const getCartByUserId = asyncHandler(async(req:Request, res: Response) =>
 
     const cart = await Cart.findOne({user: userId})
     .populate('user', '-password')
-    .populate('items.food')
+    .populate('fooditems.food');
 
     res.status(200).json({
         status:'success',
@@ -99,4 +99,4 @@ export const clearCart = asyncHandler(async(req: Request, res: Response) => {
         message: 'foodItem removed from cart',
         data: null
     })
-})
+});
