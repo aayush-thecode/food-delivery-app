@@ -10,6 +10,7 @@ import { IPayload } from '../@types/jwt.interfaces';
 import { generateResetToken } from '../utils/tokenGenerator';
 import { sendEmail } from '../utils/sendemail.utils';
 import crypto from 'crypto';
+import { Role } from '../@types/global.types';
 
 
 // user registration 
@@ -262,4 +263,61 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
     success: true,
     message: 'Password has been reset successfully.',
   });
+});
+
+//admin login only
+export const adminLogin = asyncHandler( async (req:Request, res: Response) => {
+
+  const { email, password } = req.body;
+
+    if (!email) {
+     throw new CustomError('email is required', 400)
+    }
+
+    if (!password) {
+      throw new CustomError('Password is required', 400);
+    }
+
+    const admin = await User.findOne({ email, role:Role.admin });
+
+    if (!admin) {
+      throw new CustomError('Wrong credentials provided', 400)
+  
+    }
+    //compare hash password
+    const isMatch = await compare(password, admin.password as string);
+
+    if (!isMatch) {
+
+      throw new CustomError('Wrong credentials provided', 400)
+
+
+    }
+      const payload: IPayload = {
+
+          _id: admin._id,
+          email: admin.email!,
+          firstName: admin.firstName,
+          lastName: admin.lastName,
+          role:admin.role,
+
+      }
+
+      const token = generateToken(payload);
+
+      console.log("🚀 ~ login ~ token:", token)
+
+    res.cookie('access_token', token,{
+      
+      httpOnly:true,
+      secure: process.env.NODE_ENV === 'production'
+
+    }).status(200).json({
+    status: "success",
+    success: true,
+    message: "Login successful",
+    token,admin
+
+    });
+
 });

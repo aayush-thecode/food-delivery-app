@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.forgotPassword = exports.deleteUserById = exports.login = exports.update = exports.getAllData = exports.register = void 0;
+exports.adminLogin = exports.resetPassword = exports.forgotPassword = exports.deleteUserById = exports.login = exports.update = exports.getAllData = exports.register = void 0;
 const errorhandeler_middleware_1 = require("../middleware/errorhandeler.middleware");
 const asyncHandler_utils_1 = require("../utils/asyncHandler.utils");
 const bcrypt_utils_1 = require("../utils/bcrypt.utils");
@@ -22,6 +22,7 @@ const pagination_utils_1 = require("../utils/pagination.utils");
 const tokenGenerator_1 = require("../utils/tokenGenerator");
 const sendemail_utils_1 = require("../utils/sendemail.utils");
 const crypto_1 = __importDefault(require("crypto"));
+const global_types_1 = require("../@types/global.types");
 // user registration 
 exports.register = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
@@ -204,5 +205,42 @@ exports.resetPassword = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __a
     res.status(200).json({
         success: true,
         message: 'Password has been reset successfully.',
+    });
+}));
+//admin login only
+exports.adminLogin = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    if (!email) {
+        throw new errorhandeler_middleware_1.CustomError('email is required', 400);
+    }
+    if (!password) {
+        throw new errorhandeler_middleware_1.CustomError('Password is required', 400);
+    }
+    const admin = yield users_model_1.default.findOne({ email, role: global_types_1.Role.admin });
+    if (!admin) {
+        throw new errorhandeler_middleware_1.CustomError('Wrong credentials provided', 400);
+    }
+    //compare hash password
+    const isMatch = yield (0, bcrypt_utils_1.compare)(password, admin.password);
+    if (!isMatch) {
+        throw new errorhandeler_middleware_1.CustomError('Wrong credentials provided', 400);
+    }
+    const payload = {
+        _id: admin._id,
+        email: admin.email,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        role: admin.role,
+    };
+    const token = (0, jwt_utils_1.generateToken)(payload);
+    console.log("🚀 ~ login ~ token:", token);
+    res.cookie('access_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
+    }).status(200).json({
+        status: "success",
+        success: true,
+        message: "Login successful",
+        token, admin
     });
 }));
