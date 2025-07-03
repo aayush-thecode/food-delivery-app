@@ -145,7 +145,7 @@ exports.updateFood = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awai
     }
     if (deletedImages && deletedImages.length > 0) {
         yield (0, deleteFiles_utils_1.deleteFiles)(deletedImages);
-        foodtype.images = foodtype.images.filter((image) => !deletedImages.include(image.public_id));
+        foodtype.images = foodtype.images.filter((image) => !deletedImages.includes(image.public_id));
     }
     if (images && images.length > 0) {
         const imagePath = images.map((image, index) => image.path);
@@ -182,7 +182,6 @@ exports.remove = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
     if (imagesToDelete.length > 0) {
         yield (0, deleteFiles_utils_1.deleteFiles)(imagesToDelete);
     }
-    yield foodtype_model_1.default.findByIdAndDelete(foodtype._id);
     res.status(201).json({
         success: true,
         status: 'success',

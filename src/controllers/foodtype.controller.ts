@@ -196,7 +196,7 @@ export const updateFood = asyncHandler(async (req: Request, res: Response) => {
     if (deletedImages && deletedImages.length > 0 ) {
         await deleteFiles(deletedImages as string[]);
         foodtype.images = foodtype.images.filter(
-            (image) => !deletedImages.include(image.public_id)
+            (image) => !deletedImages.includes(image.public_id)
         );
     }
 
@@ -254,8 +254,6 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
         await deleteFiles(imagesToDelete);
     }
 
-
-    await foodType.findByIdAndDelete(foodtype._id);
 
     res.status(201).json({
         success: true,
