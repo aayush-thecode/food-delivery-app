@@ -295,7 +295,7 @@ export const adminLogin = asyncHandler( async (req:Request, res: Response) => {
       const payload: IPayload = {
 
           _id: admin._id,
-          email: admin.email!,
+          email: admin.email as string,
           firstName: admin.firstName,
           lastName: admin.lastName,
           role:admin.role,
