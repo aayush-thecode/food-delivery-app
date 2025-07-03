@@ -169,7 +169,7 @@ exports.remove = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
     }
     if (foodtype.coverImage) {
         // @ts-expect-error 
-        yield (0, deleteFiles_utils_1.deleteFiles)([(_a = product.coverImage) === null || _a === void 0 ? void 0 : _a.public_id]);
+        yield (0, deleteFiles_utils_1.deleteFiles)([(_a = foodtype.coverImage) === null || _a === void 0 ? void 0 : _a.public_id]);
     }
     //delete assosiated images if they exist
     const imagesToDelete = [];
@@ -177,7 +177,7 @@ exports.remove = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
         imagesToDelete.push(foodtype.coverImage);
     }
     if (foodtype.images && foodtype.images.length > 0) {
-        imagesToDelete.push(foodtype.coverImage);
+        imagesToDelete.push(...foodtype.images);
     }
     if (imagesToDelete.length > 0) {
         yield (0, deleteFiles_utils_1.deleteFiles)(imagesToDelete);
@@ -186,6 +186,5 @@ exports.remove = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(
         success: true,
         status: 'success',
         message: 'food type deleted successfully',
-        data: foodtype
     });
 }));

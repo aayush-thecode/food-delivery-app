@@ -235,7 +235,7 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
 
     if(foodtype.coverImage) {
         // @ts-expect-error 
-        await deleteFiles([product.coverImage?.public_id] as string[])
+        await deleteFiles([foodtype.coverImage?.public_id] as string[])
     }
 
     //delete assosiated images if they exist
@@ -247,7 +247,7 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
     }
 
     if(foodtype.images && foodtype.images.length > 0) {
-        imagesToDelete.push(foodtype.coverImage as string);
+        imagesToDelete.push(...foodtype.images);
     }
 
     if (imagesToDelete.length > 0) {
@@ -259,6 +259,6 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
         success: true,
         status: 'success',
         message: 'food type deleted successfully',
-        data: foodtype
+
     })
 })
