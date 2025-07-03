@@ -21,4 +21,6 @@ router.post('/forgot-password', user_controller_1.forgotPassword);
 router.get('/reset-password/:token', user_controller_1.resetPassword);
 // Reset password route
 router.post('/reset-password/:token/submit', user_controller_1.resetPassword);
+//admin login
+router.post('/admin/login', user_controller_1.adminLogin);
 exports.default = router;
