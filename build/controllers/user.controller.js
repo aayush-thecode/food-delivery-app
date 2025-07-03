@@ -128,17 +128,15 @@ exports.login = (0, asyncHandler_utils_1.asyncHandler)((req, res) => __awaiter(v
     const token = (0, jwt_utils_1.generateToken)(payload);
     // const { password: _, ...userWithoutPassword } = user.toObject();
     res.cookie('access_token', token, {
-        // httpOnly: true,
+        httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' for prod, 'lax' for localhost
-        // maxAge: 24 * 60 * 60 * 1000,  // 1 day expiration
     })
         .status(200)
         .json({
         status: 'success',
         success: true,
         message: 'Login successful',
-        user, token,
+        token, user
     });
 }));
 //delete user by id 
